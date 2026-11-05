@@ -1,0 +1,495 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Team Playbook</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@500;600;700&display=swap">
+<style>
+/* Layout concept: a coach's tactics board. Pitch on one side, the player's own job on the other; phone stacks them. */
+:root{
+  --bg:#eef2ef; --panel:#ffffff; --ink:#14211c; --muted:#56665e; --line:#d3dcd6;
+  --pitch:#ffffff; --chalk:#8a9a91; --opp:#1c2a24; --accent:#d9540f; --accent-ink:#ffffff; --soft:#fbe9df;
+  --f-display:'Barlow Condensed','Arial Narrow',sans-serif; --f-body:'Barlow',system-ui,-apple-system,'Segoe UI',sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0f1915; --panel:#17241e; --ink:#e7efe9; --muted:#9bada3; --line:#2b3b33;
+  --pitch:#17241e; --chalk:#5f7568; --opp:#0a110e; --accent:#ff8a4c; --accent-ink:#1a0d04; --soft:#3a2416; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f1915; --panel:#17241e; --ink:#e7efe9; --muted:#9bada3; --line:#2b3b33;
+  --pitch:#17241e; --chalk:#5f7568; --opp:#0a110e; --accent:#ff8a4c; --accent-ink:#1a0d04; --soft:#3a2416; color-scheme:dark}
+*{box-sizing:border-box}
+html{color-scheme:light dark}
+body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.45;
+  padding-block:10px 28px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:1000px;margin:0 auto}
+h1{font:700 26px/1 var(--f-display);letter-spacing:.01em;margin:6px 0 2px}
+.sub{color:var(--muted);margin:0 0 12px;font-size:14px}
+nav.tabs{display:flex;gap:6px;border-bottom:2px solid var(--line);margin-bottom:12px}
+nav.tabs button{font:600 17px var(--f-display);letter-spacing:.05em;text-transform:uppercase;background:none;border:0;color:var(--muted);padding:8px 14px;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px}
+nav.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.grp{font:600 12px var(--f-display);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:8px 0 4px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font:500 14px var(--f-body);border:1.5px solid var(--line);background:var(--panel);color:var(--ink);border-radius:999px;padding:5px 12px;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.chip.pos[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.chip.pos{font:600 15px var(--f-display);letter-spacing:.04em;min-width:48px;padding:5px 10px}
+.main{display:grid;grid-template-columns:minmax(0,1fr);gap:14px;margin-top:12px}
+@media (min-width:820px){.main{grid-template-columns:minmax(0,420px) minmax(0,1fr);align-items:start}}
+.board{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:6px}
+.board svg{display:block;width:100%;height:auto;max-height:78vh}
+.board.half svg{max-height:none}
+.ctl{display:flex;gap:6px;align-items:center;margin-top:8px;flex-wrap:wrap}
+.ctl button{font:600 15px var(--f-display);letter-spacing:.05em;text-transform:uppercase;border:1.5px solid var(--ink);background:var(--panel);color:var(--ink);border-radius:8px;padding:7px 12px;cursor:pointer;min-height:40px}
+.ctl button.go{background:var(--ink);color:var(--bg)}
+.ctl button:disabled{opacity:.35;cursor:default}
+.dots{display:flex;gap:5px;margin-left:auto;align-items:center}
+.dots i{width:9px;height:9px;border-radius:50%;background:var(--line);display:block}
+.dots i.on{background:var(--accent)}
+.cap{min-height:46px;margin:8px 2px 0;font-size:15px}
+.cap b{font:700 13px var(--f-display);letter-spacing:.1em;text-transform:uppercase;color:var(--accent);display:block}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin-bottom:12px}
+.card h2{font:700 21px/1.1 var(--f-display);letter-spacing:.02em;margin:0 0 6px}
+.card h3{font:700 14px var(--f-display);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:0 0 6px}
+.mine{background:var(--soft);border-color:var(--accent)}
+.mine .job{font-size:17px;margin:2px 0 8px}
+.moves{list-style:none;margin:0;padding:0;display:grid;gap:4px}
+.moves button{width:100%;text-align:left;font:400 14px var(--f-body);background:transparent;border:1px solid var(--line);border-radius:7px;padding:6px 9px;color:var(--ink);cursor:pointer}
+.moves button.now{border-color:var(--accent);background:var(--panel)}
+.hint{color:var(--muted);margin:0}
+table{border-collapse:collapse;width:100%}
+.alljobs td,.alljobs th{border-top:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top;font-size:14px}
+.alljobs th{font:700 15px var(--f-display);letter-spacing:.04em;width:52px}
+.alljobs tr.sel{background:var(--soft)}
+.notes ul{margin:0 0 4px;padding-left:18px}.notes li{margin-bottom:5px}
+.notes h3{margin-top:8px}
+summary{cursor:pointer;font:700 14px var(--f-display);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+/* svg */
+.pt-line{stroke:var(--chalk);fill:none;stroke-width:.3;stroke-linejoin:round}
+.pt-goal{stroke:var(--ink);stroke-width:.9}
+.pl circle{fill:var(--panel);stroke:var(--ink);stroke-width:.4}
+.pl text{font:700 1.6px var(--f-body);fill:var(--ink);text-anchor:middle;dominant-baseline:central;pointer-events:none}
+.pl{cursor:pointer}
+.pl.dim{opacity:.7}
+.pl.sel circle{fill:var(--accent);stroke:var(--ink)}
+.pl.sel text{fill:var(--accent-ink)}
+.opp circle{fill:#9aa6a0;stroke:#9aa6a0}
+.opp text{font:700 1.5px var(--f-body);fill:#fff;text-anchor:middle;dominant-baseline:central}
+.ball{fill:#fff;stroke:#111;stroke-width:.35}
+.ar{stroke:var(--ink);stroke-width:.34;fill:none}
+.ar.run,.ar.alt{stroke-dasharray:1.1 .8;stroke-width:.28}
+.ar.mine{stroke:var(--accent);stroke-width:.5}
+.ar.fade{animation:fd .5s ease both}
+@keyframes fd{from{opacity:0}to{opacity:1}}
+.num{font:700 2.2px var(--f-body);fill:var(--ink);text-anchor:middle;dominant-baseline:central;paint-order:stroke;stroke:var(--pitch);stroke-width:.5px}
+.num.mine{fill:var(--accent)}
+.mk{stroke:var(--muted);stroke-width:.25;stroke-dasharray:.2 1;stroke-linecap:round}
+.dim-l{stroke:var(--ink);stroke-width:.2;fill:none}
+.dim-t{font:600 1.5px var(--f-body);fill:var(--ink);text-anchor:middle;dominant-baseline:central;paint-order:stroke;stroke:var(--pitch);stroke-width:.5px}
+@media (prefers-reduced-motion:reduce){.ar.fade{animation:none}}
+/* rosters */
+.rwrap{overflow-x:auto}
+.rost{min-width:440px}
+.rost th,.rost td{border:1px solid var(--line);padding:7px 6px;text-align:center;font-size:14px}
+.rost th{font:700 14px var(--f-display);letter-spacing:.06em;background:var(--panel)}
+.rost td.me{background:var(--accent);color:var(--accent-ink);font-weight:600}
+.rost td.half,.rost th.half{border-left:3px double var(--ink)}
+.rost td.pos{font:700 15px var(--f-display);text-align:left;background:var(--panel)}
+.pm{font-size:12px;color:var(--muted);margin:6px 0 0}
+</style>
+
+</head>
+<body>
+<div class="wrap">
+  <h1>Team Playbook</h1>
+  <p class="sub">Pick a play, then tap your position.</p>
+
+  <section id="v-plays">
+    <div class="card" style="margin-bottom:10px">
+      <h3>I play</h3>
+      <div class="chips" id="c-pos"></div>
+    </div>
+    <div class="grp">Set plays</div><div class="chips" id="c-set"></div>
+    <div class="grp">Shapes and opponents</div><div class="chips" id="c-shape"></div>
+    <div class="main">
+      <div>
+        <div class="board" id="board"><svg id="svg" role="img" aria-label="Pitch diagram"></svg></div>
+        <div class="ctl">
+          <button id="b-back" aria-label="Previous step">Back</button>
+          <button id="b-play" class="go">Play</button>
+          <button id="b-next" aria-label="Next step">Next</button>
+          <button id="b-reset" aria-label="Restart">Restart</button>
+          <span class="dots" id="dots" hidden></span>
+        </div>
+        <div class="cap" id="cap" aria-live="polite"></div>
+      </div>
+      <div>
+        <div id="mine"></div>
+        <details class="card notes" id="notes" hidden></details>
+        <div class="card"><details><summary>Everyone's jobs in this play</summary><table class="alljobs" id="alljobs"></table></details></div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<script>
+(function(){
+var POS=['GK','LB','CB','RB','CM','ST1','ST2'];
+var NS='http://www.w3.org/2000/svg';
+var reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion:reduce)').matches;
+function $(i){return document.getElementById(i)}
+function store(k,v){try{if(v===undefined)return localStorage.getItem(k);localStorage.setItem(k,v)}catch(e){return null}}
+
+/* ---------- play data (world coordinates: x 0-40 across, y up the pitch, our goal at y=0) ---------- */
+var P=[];
+var KJ={GK:'Stay in the box.',CB:'Step up 5m. Stay central as the safe back option.',LB:'Step up. Be the switch option if the right side is blocked.',RB:'Take pass 2 from the CM, pass up to ST2 (3).',CM:'Take pass 1, pass to the RB (2). Step up, take the wall pass (4), return it (5).',ST1:'Pass back to the CM (1). Run through the middle, take pass 6, shoot (7).',ST2:'Take pass 3, wall pass to the CM (4). Run past, take pass 5, pass inside (6).'};
+var GJ={GK:'Roll short to the LB (1). Stay on the goal line.',CB:'Step up 5m. Take pass 5 from the CM, switch to the RB (6).',LB:'Wait in the box corner. Take pass 1, pass to the CM (2). If pressed, kick it out.',RB:'Step up on the right. Take pass 6, pass up to ST2 (7).',CM:'Take pass 2, pass to ST1 (3). Step up, take the wall pass (4), pass to the CB (5).',ST1:'Drop low to take pass 3, lay it back (4). Run through the middle, shoot (9).',ST2:'Wait high on the right. Take pass 7, pass inside to ST1 (8).'};
+var TA={GK:'Stay central. Last-resort back option.',CB:'Stand 5-6m behind the CM as the safe option.',LB:"Throw on the left: take it, short to the CM's feet. Throw on the right: move in toward the middle.",RB:"Throw on the right: take it, short to the CM's feet. Throw on the left: move in toward the middle.",CM:'Come 5m from the thrower and take the throw. Pass to ST1 if free, otherwise back to the CB. Then move into open space 5m from the ball.',ST1:'Stay high. Drop 5m to take a pass from the CM.',ST2:'Stay high.'};
+var TD={GK:'Stay central. Watch for a ball over the top.',CB:'Stay central. Block the middle.',LB:'Throw on the left: mark the receiver 2-3m off, goal side. Throw on the right: move in toward the middle.',RB:'Throw on the right: mark the receiver 2-3m off, goal side. Throw on the left: move in toward the middle.',CM:'Move to the ball side as the second marker.',ST1:'Drop back to halfway as an outlet.',ST2:'Stay high.'};
+var CA={GK:'Stay in goal.',CB:'Stay near halfway to stop a counter.',LB:'Nearest the corner: jog over while ST1 sets the ball and wait 5m from the taker. Take pass 1, pass to the CM (2). Otherwise stay near halfway with the CB.',RB:'Nearest the corner: jog over while ST1 sets the ball and wait 5m from the taker. Take pass 1, pass to the CM (2). Otherwise stay near halfway with the CB.',CM:'Run to the near post. Take pass 2, pass to ST2 (3).',ST1:'Take the corner: short pass to the nearest fullback (1). Follow in to the edge of the box.',ST2:'Run to the penalty spot. Take pass 3 and shoot (4).'};
+var CD={GK:'Stay in the middle of the goal. Call "keeper".',CB:'Mark the most dangerous attacker in front of goal.',LB:'Take the post on your side. Stop low shots. Clear wide.',RB:'Take the post on your side. Stop low shots. Clear wide.',CM:'Stand on the edge of the box. Take the clearance and any cutback.',ST1:'Stand 4-5m from the taker to block the short pass.',ST2:'Stay at halfway as an outlet.'};
+var PJ={GK:'On the goal line, in the middle of the goal, 6-7m behind the CB. Roll short to a fullback. Call "keeper".',CB:'Centre, in front of goal, level with the top of the box. Cover the middle, be the safe back-pass. Step up 5m when we attack.',LB:'6-7m to the left of the CB, level with her. Move up when the ball goes forward. Kick it out if pressed. Tuck in when the ball is on the far side.',RB:'6-7m to the right of the CB, level with her. Move up when the ball goes forward. Kick it out if pressed. Tuck in when the ball is on the far side.',CM:'Centre, 6-7m in front of the CB, between the fullbacks. Be the hub: check back for the ball, pass wide. Do not dribble.',ST1:'About 6m ahead of the CM, left of centre, 8m from ST2. Stay high. One striker drops 5m to receive, the other stays.',ST2:'About 6m ahead of the CM, right of centre, 8m from ST1. Stay high. One striker drops 5m to receive, the other stays.'};
+var VJ={GK:'Stay central. Call "man on" when a teammate loses her player.',CB:'Take their ST. Stay close and goal side.',LB:'Take their RM, the wide midfielder on your side.',RB:'Take their LM, the wide midfielder on your side.',CM:'Take their CM.',ST1:'Stand 4-5m from their back on your side. Block the pass into the middle and force the ball wide. Press only when it goes to the sideline.',ST2:'Stand 4-5m from their back on your side. Block the pass into the middle and force the ball wide. Press only when it goes to the sideline.'};
+var DJ={GK:'Stay central. Watch for a ball over the top.',CB:'Take their forward, even if she waits near our goal. Stay goal side. Never go to the ball.',LB:'Take the wide player on your side. Stay goal side and show her wide.',RB:'Take the wide player on your side. Stay goal side and show her wide.',CM:'Slow the ball carrier. Stand 2m off, side on, between her and our goal. Do not try to take the ball.',ST1:'Stay high near their goal. You are the outlet for a long clearance. There is no offside.',ST2:'Drop back beside the CM. Cover behind her and hold your mark.'};
+
+P.push({id:'ko',grp:'set',name:'Kick-off after a goal',half:false,jobs:KJ,
+ players:{GK:[20,2],LB:[11,14],CB:[20,10],RB:[28,15],CM:[20,17.5],ST1:[20,25],ST2:[32,23]},
+ opp:[[10,33],[16,41],[31,42],[38,30],[5,38],[20,47]],ball:'ST1',
+ steps:[
+ {t:'ST1 kicks off back to the CM.',pass:['ST1','CM',1,-1]},
+ {t:'CM passes to the RB, then steps up. LB and CB move up the pitch with her.',pass:['CM','RB',2,-1],mv:{CM:[25,28],LB:[10,22],CB:[15,14]}},
+ {t:'RB passes to ST2.',pass:['RB','ST2',3,-1]},
+ {t:'ST2 passes inside to the CM, then runs past her. ST1 runs through the middle.',pass:['ST2','CM',4,1],mv:{ST2:[32,33],ST1:[24,38]}},
+ {t:'CM passes out to ST2 on the wing.',pass:['CM','ST2',5,1]},
+ {t:'ST2 passes inside to ST1.',pass:['ST2','ST1',6,-1]},
+ {t:'ST1 shoots.',pass:['ST1',[22.6,45.2],7,-1],dash:1}]});
+
+P.push({id:'gk',grp:'set',name:'Goal kick',half:false,jobs:GJ,
+ players:{GK:[20,2],LB:[14,4.5],CB:[20,9],RB:[27,4.5],CM:[14,11],ST1:[9,17],ST2:[28,25]},
+ opp:[[4,27],[22,23],[34,32],[12,40],[27,40],[20,47]],ball:'GK',
+ steps:[
+ {t:'GK rolls a short pass to the LB.',pass:['GK','LB',1,1]},
+ {t:'LB passes to the CM. The RB steps up on the right.',pass:['LB','CM',2,1],mv:{RB:[27,17]}},
+ {t:'CM passes to ST1, who has dropped low. CM steps up.',pass:['CM','ST1',3,1],mv:{CM:[15,19]}},
+ {t:'ST1 lays it back to the CM. ST1 runs through the middle and the CB steps up.',pass:['ST1','CM',4,-1],mv:{ST1:[20,32],CB:[20,16]}},
+ {t:'CM passes to the CB.',pass:['CM','CB',5,1]},
+ {t:'CB switches the ball to the RB.',pass:['CB','RB',6,1]},
+ {t:'RB passes up to ST2.',pass:['RB','ST2',7,-1]},
+ {t:'ST2 passes inside to ST1.',pass:['ST2','ST1',8,1]},
+ {t:'ST1 shoots.',pass:['ST1',[20,45.5],9,1],dash:1}]});
+
+P.push({id:'tia',grp:'set',name:'Throw-in: attack',half:true,jobs:TA,
+ players:{LB:[0.8,12],CM:[7,15.5],CB:[12,8],GK:[20,2],RB:[28,8],ST1:[13,25],ST2:[28,26]},opp:[],ball:'LB',
+ notes:[['Remember',['If the throw is on the other side of the pitch, swap left and right.']]],
+ steps:[
+ {t:'LB throws short to the CM\'s feet.',pass:['LB','CM',1,1]},
+ {t:'CM passes to ST1 if she is free. If not, back to the CB.',pass:['CM','ST1',2,1],alt:['CM','CB']}]});
+
+P.push({id:'tid',grp:'set',name:'Throw-in: defend',half:true,jobs:TD,
+ players:{GK:[20,2],CB:[19,9],LB:[6.5,12.8],CM:[13.5,15],RB:[26,9],ST1:[13,28],ST2:[29,29]},
+ opp:[[0.5,16,'T'],[9,17.5],[9,23]],ball:[0.5,16],
+ notes:[['Remember',['If the throw is on the other side of the pitch, swap left and right.']]],
+ steps:[
+ {t:'They throw to a teammate. LB closes her down, 2-3m off and goal side. CM moves to the ball side as the second marker.',pass:['T',[9,17.5],0,1],mv:{LB:[7.5,14.5],CM:[11.5,15.5]}}]});
+
+P.push({id:'ca',grp:'set',name:'Corner kick: attack',half:true,jobs:CA,
+ players:{ST1:[0.9,0.9],LB:[6.5,5.5],CB:[20,26],RB:[28,24],CM:[24,15],ST2:[30,12]},
+ opp:[[20,1.8,'GK'],[13,13.5],[27,6]],ball:'ST1',
+ notes:[['Why this works',['Short passes are easy to control. The corner is a set play, so nobody is rushed.','The CB stays near halfway so a lost ball is not a goal against us.']]],
+ steps:[
+ {t:'ST1 passes short to the LB. The CM runs to the near post.',pass:['ST1','LB',1,-1],mv:{CM:[14,8]}},
+ {t:'LB passes to the CM. ST2 runs to the penalty spot.',pass:['LB','CM',2,-1],mv:{ST2:[23,10.5]}},
+ {t:'CM passes to ST2.',pass:['CM','ST2',3,-1]},
+ {t:'ST2 shoots.',pass:['ST2',[20.8,3.6],4,1],dash:1}]});
+
+P.push({id:'cd',grp:'set',name:'Corner kick: defend',half:true,jobs:CD,
+ players:{GK:[20,1.8],LB:[15.8,2.2],RB:[24.2,2.2],CB:[20,5.4],CM:[20,13.5],ST1:[6.5,5],ST2:[22,28]},
+ opp:[[0.8,0.8,'T'],[12,6],[20.5,9.5],[26,5]],ball:[0.8,0.8],
+ steps:[
+ {t:'They cross into the middle. ST1 stands 4-5m from the taker to block the short pass.',pass:['T',[20.5,9.5],0,1]},
+ {t:'The defence clears wide. The CM takes any clearance or cutback. ST2 waits at halfway.',pass:['CB',[36,15],0,1]}]});
+
+P.push({id:'pl',grp:'shape',name:'Where to stand',half:false,jobs:PJ,
+ players:{GK:[20,2],LB:[13,9],CB:[20,9],RB:[27,9],CM:[20,16],ST1:[16,22],ST2:[24,22]},opp:[],ball:null,
+ dims:[[[14.9,9],[18.1,9],'6-7m',[0,2]],[[21.9,9],[25.1,9],'6-7m',[0,2]],[[20,3.9],[20,7.1],'6-7m',[3.2,0]],[[20,10.9],[20,14.1],'6-7m',[3.2,0]],[[17.9,22],[22.1,22],'8m',[0,2]]],
+ notes:[['Spacing',['Keep 6-7m between neighbours. Short passes along the ground are the whole plan.','The team moves as a unit: when the ball goes forward, the fullbacks and CB step up together.']]],steps:[]});
+
+P.push({id:'v321',grp:'shape',name:'Against a 3-2-1',half:false,jobs:null,
+ players:{GK:[20,2],CB:[20,14],LB:[8,26],RB:[32,18],CM:[15,21],ST1:[15,28],ST2:[29,27]},
+ opp:[[20,47,'GK'],[8,41,'RB'],[20,41,'CB'],[32,41,'LB'],[13,33,'RM'],[27,33,'LM'],[20,28,'ST']],ball:'CM',
+ notes:[['When we attack',[['Play around them, not through them.','Their five outfield players crowd the middle, so pass wide first (1), then forward along the side (2).'],['Use the spare player.','They have one ST, so our CB can mark her alone and one fullback can join the midfield.'],['Strikers run into the gaps beside their LM and RM,','not into the middle where their three at the back wait.'],['Never kick long down the middle.','Their three at the back win it.']]],
+  ['When we defend',[['Their ST is the CB\'s job.','Stay close and goal side. If she gets the ball, the fullbacks tuck in to cover.'],['Their LM and RM will join the attack.','Our CM marks one and the nearest fullback marks the other.'],['When they have the ball at the back,','the strikers stand in front of their three to block the middle and force it wide. Press only when it goes to the sideline.'],['If we lose the ball,','at least one striker drops back to help.']]]],
+ steps:[
+ {t:'CM passes wide to the LB. ST1 starts running to the gap beside their RM.',pass:['CM','LB',1,1],mv:{ST1:[4,37]}},
+ {t:'LB passes forward along the side to ST1.',pass:['LB','ST1',2,1]}]});
+
+P.push({id:'v2121',grp:'shape',name:'Against a 2-1-2-1',half:false,jobs:VJ,
+ players:{GK:[20,2],CB:[20,13],LB:[10,16],RB:[30,16],CM:[20,28],ST1:[12,34],ST2:[28,34]},
+ opp:[[20,47,'GK'],[14,41,'RB'],[26,41,'LB'],[20,35,'CM'],[7,30,'RM'],[33,30,'LM'],[20,22,'ST']],ball:null,
+ marks:[['CB',6],['LB',4],['RB',5],['CM',3],['ST1',1],['ST2',2]],steps:[],
+ notes:[['Labels are from their side','Their LB is on the right of the picture. Dotted lines show who marks whom.'],
+  ['When we attack',[['Do not go through the middle.','Their CM and two backs make three players there.'],['Pull their CM to one side, then switch.','Pass wide on one side to draw her over, then play back across to the other side. Only one of their backs is left to stop us.'],['The space is behind their LM and RM.','When they push forward, run into it and take a short pass.'],['Keep the CB and one fullback back','when the CM goes up, because their CM is then free to counter.']]],
+  ['When we defend',[['Mark the player in your area.','Our CB takes their ST, each fullback takes the wide midfielder on her side, our CM takes their CM.'],['If you lose your player,','call "man on" and the nearest teammate takes her.']]]]});
+
+P.push({id:'deep',grp:'shape',name:'When we are outplayed',half:false,jobs:DJ,
+ players:{GK:[20,2],LB:[9,10],CB:[20,8],RB:[31,10],CM:[14,19],ST2:[26,19],ST1:[20,37]},
+ opp:[[22,15.5],[4,22],[36,22],[20,25.5]],ball:[20,23.2],
+ marks:[['CB',0],['LB',1],['RB',2]],steps:[],
+ notes:[['The deep 3-2-1',[['Drop ST2 back beside the CM.','The back three stay close to our penalty area. ST1 stays high as the outlet. Keep gaps at 6-7m.'],['No tackling: do not try to take the ball.','Stand 2m off the carrier, side on, between her and goal. Make her go wide. The pass is where we win it.'],['Mark a player and stand goal side.','Our CB takes their forward even if she waits near our goal. There is no offside.'],['When we win it,','pass sideways or back to a safe teammate. Clear wide of their forward, or kick it out when pressed.'],['Swap tired players early.','Aim to lose by fewer goals, then win the next 5 minutes.']]]]});
+
+/* ---------- state ---------- */
+var cur=null,pos=[],k=0,selPos=store('pb-pos')||null,timer=null,anim=null,playing=false;
+var curPos={},curBall=[0,0],gP={},gBall=null;
+var svg=$('svg');
+
+function resolve(ref,posMap,opp){ // returns [x,y,isPlayer]
+  if(Array.isArray(ref))return [ref[0],ref[1],false];
+  if(ref==='T')return [cur.opp[0][0],cur.opp[0][1],false];
+  var p=posMap[ref];return [p[0],p[1],true];
+}
+function buildPos(p){
+  var out=[JSON.parse(JSON.stringify(p.players))];
+  p.steps.forEach(function(s,i){var n=JSON.parse(JSON.stringify(out[i]));for(var id in (s.mv||{}))n[id]=s.mv[id].slice();out.push(n)});
+  return out;
+}
+function ballAt(j){
+  var ref;
+  if(j===0)ref=cur.ball;else ref=cur.steps[j-1].pass[1];
+  if(ref===null||ref===undefined)return null;
+  if(Array.isArray(ref))return ref.slice();
+  var p=pos[j][ref];return [p[0]+2.1,p[1]-1.6];
+}
+
+/* ---------- drawing ---------- */
+function mk(tag,at,par){var e=document.createElementNS(NS,tag);for(var a in at)e.setAttribute(a,at[a]);if(par)par.appendChild(e);return e}
+function drawPitch(half){
+  var H=half?30:50,Y=function(y){return H-y};
+  svg.setAttribute('viewBox',half?'-2 -1.5 44 33.5':'-2 -1.5 44 54.5');
+  svg.innerHTML='';
+  var defs=mk('defs',{},svg);
+  ['ink','acc'].forEach(function(n){
+    var m=mk('marker',{id:'ah-'+n,viewBox:'0 0 10 10',refX:'8',refY:'5',markerWidth:'4',markerHeight:'4',orient:'auto-start-reverse'},defs);
+    mk('path',{d:'M0 0L10 5L0 10z',fill:n==='ink'?'var(--ink)':'var(--accent)'},m);
+  });
+  mk('rect',{x:-2,y:-1.5,width:44,height:half?33.5:54.5,fill:'var(--pitch)',rx:0},svg);
+  var g=mk('g',{},svg);
+  if(half){
+    mk('path',{class:'pt-line',d:'M0 0V30M40 0V30M0 0H40'},g);
+    mk('line',{class:'pt-line','stroke-dasharray':'1.2 .9',x1:0,y1:0,x2:40,y2:0},g);
+    mk('path',{class:'pt-line',d:'M24.79 '+Y(11.61)+'A6 6 0 0 0 15.21 '+Y(11.61)},g);
+    mk('rect',{class:'pt-line',x:8,y:Y(12),width:24,height:12},g);
+    mk('rect',{class:'pt-line',x:14,y:Y(4.5),width:12,height:4.5},g);
+    mk('line',{class:'pt-goal',x1:17,y1:Y(-0.3),x2:23,y2:Y(-0.3)},g);
+    return Y;
+  }
+  mk('rect',{class:'pt-line',x:0,y:0,width:40,height:50},g);
+  mk('line',{class:'pt-line','stroke-dasharray':'1.2 .9',x1:0,y1:25,x2:40,y2:25},g);
+  mk('circle',{class:'pt-line','stroke-dasharray':'1.2 .9',cx:20,cy:25,r:5},g);
+  [0,50].forEach(function(e){
+    var s=e===0?1:-1;
+    mk('rect',{class:'pt-line',x:8,y:Y(e===0?12:e),width:24,height:12},g);
+    mk('rect',{class:'pt-line',x:14,y:Y(e===0?4.5:e),width:12,height:4.5},g);
+    mk('line',{class:'pt-goal',x1:17,y1:Y(e-0.3*s),x2:23,y2:Y(e-0.3*s)},g);
+  });
+  return Y;
+}
+var Y=null;
+function load(id){
+  stop();
+  cur=P.filter(function(p){return p.id===id})[0];
+  pos=buildPos(cur);k=0;
+  $('board').className='board'+(cur.half?' half':'');
+  Y=drawPitch(cur.half);
+  var H=cur.half?30:50;
+  gDims=mk('g',{},svg);gMk=mk('g',{},svg);gTr=mk('g',{},svg);gAr=mk('g',{},svg);
+  var gOpp=mk('g',{},svg);var gPl=mk('g',{},svg);
+  (cur.dims||[]).forEach(function(d){
+    mk('line',{class:'dim-l',x1:d[0][0],y1:Y(d[0][1]),x2:d[1][0],y2:Y(d[1][1]),'marker-start':'url(#ah-ink)','marker-end':'url(#ah-ink)'},gDims);
+    var t=mk('text',{class:'dim-t',x:(d[0][0]+d[1][0])/2+d[3][0],y:Y((d[0][1]+d[1][1])/2+d[3][1])},gDims);t.textContent=d[2];
+  });
+  cur.opp.forEach(function(o){
+    var g=mk('g',{class:'opp',transform:'translate('+o[0]+' '+Y(o[1])+')'},gOpp);
+    mk('circle',{r:1.9},g);if(o[2]){var t=mk('text',{},g);t.textContent=o[2]}
+  });
+  gP={};curPos={};
+  POS.forEach(function(id){
+    var p=pos[0][id];if(!p)return;
+    curPos[id]=p.slice();
+    var g=mk('g',{class:'pl',transform:'translate('+p[0]+' '+Y(p[1])+')',tabindex:0,role:'button','aria-label':id},gPl);
+    mk('circle',{r:1.9},g);var t=mk('text',{},g);t.textContent=id;
+    g.addEventListener('click',function(){setSel(selPos===id?null:id)});
+    g.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();setSel(selPos===id?null:id)}});
+    gP[id]=g;
+  });
+  gBall=mk('circle',{class:'ball',r:.75},svg);
+  var b=ballAt(0);curBall=b||[0,0];gBall.style.display=b?'':'none';
+  placeBall();
+  if(cur.marks)cur.marks.forEach(function(m){
+    var a=pos[0][m[0]],o=cur.opp[m[1]];
+    mk('line',{class:'mk',x1:a[0],y1:Y(a[1]),x2:o[0],y2:Y(o[1])},gMk);
+  });
+  var multi=cur.steps.length>0;
+  ['b-back','b-play','b-next','b-reset'].forEach(function(i){$(i).hidden=!multi});
+  var d=$('dots');d.innerHTML='';
+  
+  drawLayers();updateUI();
+  document.querySelectorAll('#c-set .chip,#c-shape .chip').forEach(function(c){c.setAttribute('aria-pressed',c.dataset.id===id?'true':'false')});
+  store('pb-play',id);
+}
+var gDims,gMk,gTr,gAr;
+function placeBall(){if(gBall){gBall.setAttribute('cx',curBall[0]);gBall.setAttribute('cy',Y(curBall[1]))}}
+function placePlayers(){for(var id in curPos){gP[id].setAttribute('transform','translate('+curPos[id][0]+' '+Y(curPos[id][1])+')')}}
+
+function seg(a,b,sa,sb){ // shorten segment in world coords
+  var dx=b[0]-a[0],dy=b[1]-a[1],L=Math.sqrt(dx*dx+dy*dy)||1,ux=dx/L,uy=dy/L;
+  return [[a[0]+ux*sa,a[1]+uy*sa],[b[0]-ux*sb,b[1]-uy*sb],ux,uy];
+}
+function drawLayers(newest){
+  gAr.innerHTML='';gTr.innerHTML='';
+  for(var j=1;j<=k;j++){
+    var s=cur.steps[j-1],pre=pos[j-1];
+    // runs
+    for(var id in (s.mv||{})){
+      var a=pre[id],b=s.mv[id],q=seg(a,b,2.2,2.2);
+      mk('line',{class:'ar run'+(selPos===id?' mine':''),x1:q[0][0],y1:Y(q[0][1]),x2:q[1][0],y2:Y(q[1][1]),'marker-end':'url(#ah-'+(selPos===id?'acc':'ink')+')'},gTr);
+    }
+    var pa=s.pass,from=pa[0]==='T'?[cur.opp[0][0],cur.opp[0][1],false]:resolve(pa[0],pre),to=resolve(pa[1],pre);
+    var involved=(pa[0]===selPos||pa[1]===selPos);
+    function arrow(f,t,cls,num,side){
+      var q=seg(f,t,f[2]?2.2:.4,t[2]?2.2:.4);
+      var ln=mk('line',{class:'ar '+cls+(involved?' mine':'')+(newest&&j===k?' fade':''),x1:q[0][0],y1:Y(q[0][1]),x2:q[1][0],y2:Y(q[1][1]),'marker-end':'url(#ah-'+(involved?'acc':'ink')+')'},gAr);
+      if(num){
+        var mx=(f[0]+t[0])/2-q[3]*side*2.3,my=(f[1]+t[1])/2+q[2]*side*2.3;
+        var tx=mk('text',{class:'num'+(involved?' mine':''),x:mx,y:Y(my)},gAr);tx.textContent=num;
+      }
+    }
+    arrow(from,to,s.dash?'run':'pass',pa[2]||0,pa[3]||1);
+    if(s.alt){arrow(resolve(s.alt[0],pre),resolve(s.alt[1],pre),'alt',0,1)}
+  }
+}
+
+/* ---------- animation ---------- */
+function ease(t){return t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2}
+function goTo(j,instant){
+  if(j<0||j>cur.steps.length)return;
+  var fromP={},toP=pos[j],fromB=curBall.slice(),toB=ballAt(j);
+  for(var id in curPos)fromP[id]=curPos[id].slice();
+  var forward=j>k;k=j;
+  drawLayers(forward);updateUI();
+  if(toB===null)toB=fromB;
+  gBall.style.display=ballAt(j)||ballAt(0)?'':'none';
+  if(anim)cancelAnimationFrame(anim);
+  if(instant||reduce){for(var id in toP)curPos[id]=toP[id].slice();curBall=toB.slice();placePlayers();placeBall();return}
+  var t0=null,dur=700;
+  function frame(ts){
+    if(!t0)t0=ts;var t=Math.min(1,(ts-t0)/dur),e=ease(t);
+    for(var id in toP){curPos[id]=[fromP[id][0]+(toP[id][0]-fromP[id][0])*e,fromP[id][1]+(toP[id][1]-fromP[id][1])*e]}
+    curBall=[fromB[0]+(toB[0]-fromB[0])*e,fromB[1]+(toB[1]-fromB[1])*e];
+    placePlayers();placeBall();
+    if(t<1)anim=requestAnimationFrame(frame);else anim=null;
+  }
+  anim=requestAnimationFrame(frame);
+}
+function stop(){playing=false;clearTimeout(timer);var b=$('b-play');if(b)b.textContent='Play'}
+function tick(){
+  if(!playing)return;
+  if(k>=cur.steps.length){stop();return}
+  goTo(k+1);
+  if(k>=cur.steps.length){stop();return}
+  timer=setTimeout(tick,2300);
+}
+$('b-play').onclick=function(){
+  if(playing){stop();return}
+  if(k>=cur.steps.length)goTo(0,true);
+  playing=true;this.textContent='Pause';timer=setTimeout(tick,200);
+};
+$('b-next').onclick=function(){stop();goTo(k+1)};
+$('b-back').onclick=function(){stop();goTo(k-1)};
+$('b-reset').onclick=function(){stop();goTo(0)};
+
+/* ---------- panels ---------- */
+function passText(s){
+  var p=s.pass;if(!p[2])return null;return p;
+}
+function updateUI(){
+  var n=cur.steps.length;
+  $('b-back').disabled=k===0;$('b-next').disabled=k>=n;
+  var ds=$('dots').children;for(var i=0;i<ds.length;i++)ds[i].className=i<=k?'on':'';
+  var cap=$('cap');
+  if(!n){cap.innerHTML='<b>Shape</b>'+(cur.id==='pl'?'Starting positions with the distances to keep.':'Dotted lines show who marks whom.');}
+  else if(k===0){cap.innerHTML='<b>Start</b>Starting positions. Press Play or Next to follow the ball.';}
+  else{cap.innerHTML='<b>Step '+k+' of '+n+'</b>'+cur.steps[k-1].t;}
+  renderMine();renderAll();renderNotes();
+  POS.forEach(function(id){var g=gP[id];if(!g)return;g.setAttribute('class','pl'+(selPos&&selPos===id?' sel':selPos?' dim':''))});
+  document.querySelectorAll('#c-pos .chip').forEach(function(c){c.setAttribute('aria-pressed',c.dataset.id===selPos?'true':'false')});
+}
+function renderMine(){
+  var box=$('mine');
+  if(!selPos||!pos[0][selPos]){box.innerHTML='<div class="card"><p class="hint">Tap a position above, or a player on the pitch, to see where you stand and what you do in this play.</p></div>';return}
+  var h='<div class="card mine"><h3>'+selPos+' in '+cur.name+'</h3>';
+  var job=cur.jobs&&cur.jobs[selPos];
+  h+='<p class="job">'+(job?esc(job):'See the notes below for this shape.')+'</p>';
+  var items=[];
+  cur.steps.forEach(function(s,i){
+    var p=s.pass,line=null;
+    var num=p[2]?'Pass '+p[2]+': ':'';
+    if(p[0]===selPos){line=num+'you pass to '+(Array.isArray(p[1])?'goal. Shoot.':p[1])+'.'}
+    else if(p[1]===selPos){line=num+p[0]+' passes to you.'}
+    var mv=s.mv&&s.mv[selPos];
+    if(mv)line=(line?line+' ':'')+'You move.';
+    if(line)items.push([i+1,line]);
+  });
+  if(items.length){
+    h+='<h3 style="margin-top:6px">Your part, step by step</h3><ul class="moves">';
+    items.forEach(function(it){h+='<li><button data-step="'+it[0]+'"'+(k===it[0]?' class="now"':'')+'>Step '+it[0]+'. '+esc(it[1])+'</button></li>'});
+    h+='</ul>';
+  }else if(cur.steps.length){h+='<p class="hint">You are not on the ball in this play. Hold your position.</p>'}
+  h+='</div>';
+  box.innerHTML=h;
+  box.querySelectorAll('button[data-step]').forEach(function(b){b.onclick=function(){stop();goTo(+b.dataset.step)}});
+}
+function renderAll(){
+  var t=$('alljobs'),h='';
+  if(!cur.jobs){t.innerHTML='<tr><td>No per-position list for this shape. See the notes.</td></tr>';return}
+  POS.forEach(function(id){if(!pos[0][id])return;h+='<tr'+(id===selPos?' class="sel"':'')+'><th>'+id+'</th><td>'+esc(cur.jobs[id]||'')+'</td></tr>'});
+  t.innerHTML=h;
+}
+function renderNotes(){
+  var n=$('notes');
+  if(!cur.notes){n.hidden=true;return}
+  var h='';
+  cur.notes.forEach(function(sec){
+    h+='<h3>'+esc(sec[0])+'</h3>';
+    if(typeof sec[1]==='string'){h+='<p style="margin:0 0 6px">'+esc(sec[1])+'</p>';return}
+    h+='<ul>';sec[1].forEach(function(it){
+      if(Array.isArray(it))h+='<li><b>'+esc(it[0])+'</b> '+esc(it[1])+'</li>';else h+='<li>'+esc(it)+'</li>';
+    });h+='</ul>';
+  });
+  n.innerHTML='<summary>Notes</summary>'+h;n.hidden=false;
+}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function setSel(id){selPos=id;store('pb-pos',id||'');updateUI();drawLayers()}
+
+/* ---------- chips ---------- */
+P.forEach(function(p){
+  var b=document.createElement('button');b.className='chip';b.textContent=p.name;b.dataset.id=p.id;b.setAttribute('aria-pressed','false');
+  b.onclick=function(){load(p.id)};
+  $(p.grp==='set'?'c-set':'c-shape').appendChild(b);
+});
+POS.forEach(function(id){
+  var b=document.createElement('button');b.className='chip pos';b.textContent=id;b.dataset.id=id;b.setAttribute('aria-pressed','false');
+  b.onclick=function(){setSel(selPos===id?null:id)};
+  $('c-pos').appendChild(b);
+});
+
+if(selPos==='')selPos=null;
+var start=store('pb-play');if(!P.some(function(p){return p.id===start}))start='ko';
+load(start);
+})();
+</script>
+</body>
+</html>
