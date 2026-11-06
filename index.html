@@ -81,8 +81,12 @@ summary{cursor:pointer;font:700 14px var(--f-display);letter-spacing:.1em;text-t
 .ar.run,.ar.alt{stroke-dasharray:1.1 .8;stroke-width:.28}
 .ar.mine{stroke:var(--accent);stroke-width:.5}
 .ar.fade{animation:fd .5s ease both}
+
+.ghost{fill:none;stroke:var(--muted);stroke-width:.3;stroke-dasharray:.6 .5}
+.gtx{font:600 1.3px var(--f-body);fill:var(--muted);text-anchor:middle;dominant-baseline:central}
 @keyframes fd{from{opacity:0}to{opacity:1}}
-.num{font:700 2.2px var(--f-body);fill:var(--ink);text-anchor:middle;dominant-baseline:central;paint-order:stroke;stroke:var(--pitch);stroke-width:.5px}
+.nn{font-size:2.1px;font-weight:700}
+.num{font:600 1.45px var(--f-body);fill:var(--ink);text-anchor:middle;dominant-baseline:central;paint-order:stroke;stroke:var(--pitch);stroke-width:.5px}
 .num.mine{fill:var(--accent)}
 .mk{stroke:var(--muted);stroke-width:.25;stroke-dasharray:.2 1;stroke-linecap:round}
 .dim-l{stroke:var(--ink);stroke-width:.2;fill:none}
@@ -103,7 +107,7 @@ summary{cursor:pointer;font:700 14px var(--f-display);letter-spacing:.1em;text-t
 <body>
 <div class="wrap">
   <h1>Hot Flashes Play</h1>
-  <p class="sub">Pick a play, then tap your position.</p>
+  <p class="sub">Pick your position, then pick a play.</p>
 
   <section id="v-plays">
     <div class="card" style="margin-bottom:10px">
@@ -145,13 +149,13 @@ function store(k,v){try{if(v===undefined)return localStorage.getItem(k);localSto
 /* ---------- play data (world coordinates: x 0-40 across, y up the pitch, our goal at y=0) ---------- */
 var P=[];
 var KJ={GK:'Stay in the box.',CB:'Step up 5m. Stay central as the safe back option.',LB:'Step up. Be the switch option if the right side is blocked.',RB:'Take pass 2 from the CM, pass up to ST2 (3).',CM:'Take pass 1, pass to the RB (2). Step up, take the wall pass (4), return it (5).',ST1:'Pass back to the CM (1). Run through the middle, take pass 6, shoot (7).',ST2:'Take pass 3, wall pass to the CM (4). Run past, take pass 5, pass inside (6).'};
-var GJ={GK:'Roll short to the LB (1). Stay on the goal line.',CB:'Step up 5m. Take pass 5 from the CM, switch to the RB (6).',LB:'Wait in the box corner. Take pass 1, pass to the CM (2). If pressed, kick it out.',RB:'Step up on the right. Take pass 6, pass up to ST2 (7).',CM:'Take pass 2, pass to ST1 (3). Step up, take the wall pass (4), pass to the CB (5).',ST1:'Drop low to take pass 3, lay it back (4). Run through the middle, shoot (9).',ST2:'Wait high on the right. Take pass 7, pass inside to ST1 (8).'};
+var GJ={GK:'Roll short to the LB (1). Stay on the goal line.',CB:'Step up 5m. Take pass 5 from the CM, switch to the RB (6).',LB:'Wait in the box corner. Take pass 1, pass to the CM (2). If pressed, kick it out to the side.',RB:'Step up on the right. Take pass 6, pass up to ST2 (7).',CM:'Take pass 2, pass to ST1 (3). Step up, take the wall pass (4), pass to the CB (5).',ST1:'Drop low to take pass 3, lay it back (4). Run through the middle, shoot (9).',ST2:'Wait high on the right. Take pass 7, pass inside to ST1 (8).'};
 var TA={GK:'Stay central. Last-resort back option.',CB:'Stand 5-6m behind the CM as the safe option.',LB:"Throw on the left: take it, short to the CM's feet. Throw on the right: move in toward the middle.",RB:"Throw on the right: take it, short to the CM's feet. Throw on the left: move in toward the middle.",CM:'Come 5m from the thrower and take the throw. Pass to ST1 if free, otherwise back to the CB. Then move into open space 5m from the ball.',ST1:'Stay high. Drop 5m to take a pass from the CM.',ST2:'Stay high.'};
 var TD={GK:'Stay central. Watch for a ball over the top.',CB:'Stay central. Block the middle.',LB:'Throw on the left: mark the receiver 2-3m off, goal side. Throw on the right: move in toward the middle.',RB:'Throw on the right: mark the receiver 2-3m off, goal side. Throw on the left: move in toward the middle.',CM:'Move to the ball side as the second marker.',ST1:'Drop back to halfway as an outlet.',ST2:'Stay high.'};
 var CA={GK:'Stay in goal.',CB:'Stay near halfway to stop a counter.',LB:'Nearest the corner: jog over while ST1 sets the ball and wait 5m from the taker. Take pass 1, pass to the CM (2). Otherwise stay near halfway with the CB.',RB:'Nearest the corner: jog over while ST1 sets the ball and wait 5m from the taker. Take pass 1, pass to the CM (2). Otherwise stay near halfway with the CB.',CM:'Run to the near post. Take pass 2, pass to ST2 (3).',ST1:'Take the corner: short pass to the nearest fullback (1). Follow in to the edge of the box.',ST2:'Run to the penalty spot. Take pass 3 and shoot (4).'};
-var CD={GK:'Stay in the middle of the goal. Call "keeper".',CB:'Mark the most dangerous attacker in front of goal.',LB:'Take the post on your side. Stop low shots. Clear wide.',RB:'Take the post on your side. Stop low shots. Clear wide.',CM:'Stand on the edge of the box. Take the clearance and any cutback.',ST1:'Stand 4-5m from the taker to block the short pass.',ST2:'Stay at halfway as an outlet.'};
-var PJ={GK:'On the goal line, in the middle of the goal, 6-7m behind the CB. Roll short to a fullback. Call "keeper".',CB:'Centre, in front of goal, level with the top of the box. Cover the middle, be the safe back-pass. Step up 5m when we attack.',LB:'6-7m to the left of the CB, level with her. Move up when the ball goes forward. Kick it out if pressed. Tuck in when the ball is on the far side.',RB:'6-7m to the right of the CB, level with her. Move up when the ball goes forward. Kick it out if pressed. Tuck in when the ball is on the far side.',CM:'Centre, 6-7m in front of the CB, between the fullbacks. Be the hub: check back for the ball, pass wide. Do not dribble.',ST1:'About 6m ahead of the CM, left of centre, 8m from ST2. Stay high. One striker drops 5m to receive, the other stays.',ST2:'About 6m ahead of the CM, right of centre, 8m from ST1. Stay high. One striker drops 5m to receive, the other stays.'};
-var VJ={GK:'Stay central. Call "man on" when a teammate loses her player.',CB:'Take their ST. Stay close and goal side.',LB:'Take their RM, the wide midfielder on your side.',RB:'Take their LM, the wide midfielder on your side.',CM:'Take their CM.',ST1:'Stand 4-5m from their back on your side. Block the pass into the middle and force the ball wide. Press only when it goes to the sideline.',ST2:'Stand 4-5m from their back on your side. Block the pass into the middle and force the ball wide. Press only when it goes to the sideline.'};
+var CD={GK:'Stay in the middle of the goal.',CB:'Mark the most dangerous attacker in front of goal.',LB:'Take the post on your side. Stop low shots. Clear wide.',RB:'Take the post on your side. Stop low shots. Clear wide.',CM:'Stand on the edge of the box. Take the clearance and any cutback.',ST1:'Stand 4-5m from the taker to block the short pass.',ST2:'Stay at halfway as an outlet.'};
+var PJ={GK:'On the goal line, in the middle of the goal, 6-7m behind the CB. Roll short to a fullback.',CB:'Centre, in front of goal, level with the top of the box. Cover the middle, be the safe back-pass. Step up 5m when we attack.',LB:'6-7m to the left of the CB, level with her. Move up when the ball goes forward. Kick it out to the side if pressed. Tuck in when the ball is on the far side.',RB:'6-7m to the right of the CB, level with her. Move up when the ball goes forward. Kick it out to the side if pressed. Tuck in when the ball is on the far side.',CM:'Centre, 6-7m in front of the CB, between the fullbacks. Be the hub: check back for the ball, pass wide. Do not dribble.',ST1:'About 6m ahead of the CM, left of centre, 8m from ST2. Stay high. One striker drops 5m to receive, the other stays.',ST2:'About 6m ahead of the CM, right of centre, 8m from ST1. Stay high. One striker drops 5m to receive, the other stays.'};
+var VJ={GK:'Stay central. Watch for a ball over the top.',CB:'Take their ST. Stay close and goal side.',LB:'Take their RM, the wide midfielder on your side.',RB:'Take their LM, the wide midfielder on your side.',CM:'Take their CM.',ST1:'Stand 4-5m from their back on your side. Block the pass into the middle and force the ball wide. Press only when it goes to the sideline.',ST2:'Stand 4-5m from their back on your side. Block the pass into the middle and force the ball wide. Press only when it goes to the sideline.'};
 var DJ={GK:'Stay central. Watch for a ball over the top.',CB:'Take their forward, even if she waits near our goal. Stay goal side. Never go to the ball.',LB:'Take the wide player on your side. Stay goal side and show her wide.',RB:'Take the wide player on your side. Stay goal side and show her wide.',CM:'Slow the ball carrier. Stand 2m off, side on, between her and our goal. Do not try to take the ball.',ST1:'Stay high near their goal. You are the outlet for a long clearance. There is no offside.',ST2:'Drop back beside the CM. Cover behind her and hold your mark.'};
 
 P.push({id:'ko',grp:'set',name:'Kick-off after a goal',half:false,jobs:KJ,
@@ -192,7 +196,7 @@ P.push({id:'tid',grp:'set',name:'Throw-in: defend',half:true,jobs:TD,
  opp:[[0.5,16,'T'],[9,17.5],[9,23]],ball:[0.5,16],
  notes:[['Remember',['If the throw is on the other side of the pitch, swap left and right.']]],
  steps:[
- {t:'They throw to a teammate. LB closes her down, 2-3m off and goal side. CM moves to the ball side as the second marker.',pass:['T',[9,17.5],0,1],mv:{LB:[7.5,14.5],CM:[11.5,15.5]}}]});
+ {t:'They throw to a teammate. LB closes her down, 2-3m off and goal side. CM moves to the ball side as the second marker.',lab:'throw',pass:['T',[9,17.5],0,1],mv:{LB:[7.5,14.5],CM:[11.5,15.5]}}]});
 
 P.push({id:'ca',grp:'set',name:'Corner kick: attack',half:true,jobs:CA,
  players:{ST1:[0.9,0.9],LB:[6.5,5.5],CB:[20,26],RB:[28,24],CM:[24,15],ST2:[30,12]},
@@ -208,10 +212,10 @@ P.push({id:'cd',grp:'set',name:'Corner kick: defend',half:true,jobs:CD,
  players:{GK:[20,1.8],LB:[15.8,2.2],RB:[24.2,2.2],CB:[20,5.4],CM:[20,13.5],ST1:[6.5,5],ST2:[22,28]},
  opp:[[0.8,0.8,'T'],[12,6],[20.5,9.5],[26,5]],ball:[0.8,0.8],
  steps:[
- {t:'They cross into the middle. ST1 stands 4-5m from the taker to block the short pass.',pass:['T',[20.5,9.5],0,1]},
- {t:'The defence clears wide. The CM takes any clearance or cutback. ST2 waits at halfway.',pass:['CB',[36,15],0,1]}]});
+ {t:'They cross into the middle. ST1 stands 4-5m from the taker to block the short pass.',lab:'cross',pass:['T',[20.5,9.5],0,1]},
+ {t:'The defence clears wide. The CM takes any clearance or cutback. ST2 waits at halfway.',lab:'clear wide',pass:['CB',[36,15],0,1]}]});
 
-P.push({id:'pl',grp:'shape',name:'Where to stand',half:false,jobs:PJ,
+P.push({id:'pl',grp:'shape',name:'Our 3-1-2',half:false,jobs:PJ,
  players:{GK:[20,2],LB:[13,9],CB:[20,9],RB:[27,9],CM:[20,16],ST1:[16,22],ST2:[24,22]},opp:[],ball:null,
  dims:[[[14.9,9],[18.1,9],'6-7m',[0,2]],[[21.9,9],[25.1,9],'6-7m',[0,2]],[[20,3.9],[20,7.1],'6-7m',[3.2,0]],[[20,10.9],[20,14.1],'6-7m',[3.2,0]],[[17.9,22],[22.1,22],'8m',[0,2]]],
  notes:[['Spacing',['Keep 6-7m between neighbours. Short passes along the ground are the whole plan.','The team moves as a unit: when the ball goes forward, the fullbacks and CB step up together.']]],steps:[]});
@@ -231,13 +235,39 @@ P.push({id:'v2121',grp:'shape',name:'Against a 2-1-2-1',half:false,jobs:VJ,
  marks:[['CB',6],['LB',4],['RB',5],['CM',3],['ST1',1],['ST2',2]],steps:[],
  notes:[['Labels are from their side','Their LB is on the right of the picture. Dotted lines show who marks whom.'],
   ['When we attack',[['Do not go through the middle.','Their CM and two backs make three players there.'],['Pull their CM to one side, then switch.','Pass wide on one side to draw her over, then play back across to the other side. Only one of their backs is left to stop us.'],['The space is behind their LM and RM.','When they push forward, run into it and take a short pass.'],['Keep the CB and one fullback back','when the CM goes up, because their CM is then free to counter.']]],
-  ['When we defend',[['Mark the player in your area.','Our CB takes their ST, each fullback takes the wide midfielder on her side, our CM takes their CM.'],['If you lose your player,','call "man on" and the nearest teammate takes her.']]]]});
+  ['When we defend',[['Mark the player in your area.','Our CB takes their ST, each fullback takes the wide midfielder on her side, our CM takes their CM.']]]]});
 
 P.push({id:'deep',grp:'shape',name:'When we are outplayed',half:false,jobs:DJ,
  players:{GK:[20,2],LB:[9,10],CB:[20,8],RB:[31,10],CM:[14,19],ST2:[26,19],ST1:[20,37]},
  opp:[[22,15.5],[4,22],[36,22],[20,25.5]],ball:[20,23.2],
  marks:[['CB',0],['LB',1],['RB',2]],steps:[],
- notes:[['The deep 3-2-1',[['Drop ST2 back beside the CM.','The back three stay close to our penalty area. ST1 stays high as the outlet. Keep gaps at 6-7m.'],['No tackling: do not try to take the ball.','Stand 2m off the carrier, side on, between her and goal. Make her go wide. The pass is where we win it.'],['Mark a player and stand goal side.','Our CB takes their forward even if she waits near our goal. There is no offside.'],['When we win it,','pass sideways or back to a safe teammate. Clear wide of their forward, or kick it out when pressed.'],['Swap tired players early.','Aim to lose by fewer goals, then win the next 5 minutes.']]]]});
+ notes:[['The deep 3-2-1',[['Drop ST2 back beside the CM.','The back three stay close to our penalty area. ST1 stays high as the outlet. Keep gaps at 6-7m.'],['No tackling: do not try to take the ball.','Stand 2m off the carrier, side on, between her and goal. Make her go wide. The pass is where we win it.'],['Mark a player and stand goal side.','Our CB takes their forward even if she waits near our goal. There is no offside.'],['When we win it,','pass sideways or back to a safe teammate. Clear wide of their forward, or kick it out to the side when pressed.'],['Swap tired players early.','Aim to lose by fewer goals, then win the next 5 minutes.']]]]});
+
+P.push({id:'p321',grp:'shape',name:'Our defensive 3-2-1',half:false,
+ jobs:{GK:'Roll short to a fullback. Stay central.',CB:'Stay central and deep. You are the safe back option.',LB:'Stay level with the CB. Do not push up. Kick it out to the side if pressed.',RB:'Stay level with the CB. Do not push up. Kick it out to the side if pressed.',CM:'Be the hub. Take the pass, then play it to the striker or out wide.',ST1:'The only striker. Stay high, hold the ball and lay it off to ST2.',ST2:'Play beside the CM. Support the striker only when it is safe, then come back.'},
+ players:{GK:[20,2],LB:[13,9],CB:[20,9],RB:[27,9],CM:[20,16],ST1:[16,22],ST2:[24,22]},opp:[],ball:'GK',
+ notes:[['What changes from the 3-1-2',[['The back three do not move.','GK, LB, CB and RB stay exactly where they are.'],['ST2 drops back beside the CM.','Now there are two midfielders across the middle, about 10m apart.'],['ST1 stays up as the only striker.','She moves to the middle and holds the ball. There is no offside.']]],['The rules',[['The back three stay home.','The fullbacks do not go up. Last time the gaps behind them were the problem.'],['Two CMs, one striker.','The CMs stay about 10m apart and close the middle. The striker stays high, and there is no offside.'],['Short passes only.','No long kicks down the middle. Kick it out to the side when pressed.'],['Win it, then keep it.','Pass sideways or back first. Go forward only when the striker is free.']]]],
+ steps:[
+ {t:'Switch from the 3-1-2 to the 3-2-1. ST2 drops beside the CM, and ST1 moves to the middle as the only striker. The back three stay put.',mv:{CM:[15,16],ST2:[25,16],ST1:[20,28]}},
+ {t:'GK rolls a short pass to the LB.',pass:['GK','LB',1,1]},
+ {t:'LB passes to the CM.',pass:['LB','CM',2,1]},
+ {t:'CM passes forward to ST1. ST2 runs up to support.',pass:['CM','ST1',3,-1],mv:{ST2:[25,24]}},
+ {t:'ST1 lays it off to ST2 and runs up the middle.',pass:['ST1','ST2',4,1],mv:{ST1:[20,33]}},
+ {t:'ST2 passes through to ST1.',pass:['ST2','ST1',5,-1]},
+ {t:'ST1 shoots.',pass:['ST1',[20,45],6,1],dash:1}]});
+
+/* notes: short bullets, no subheaders */
+var NOTES={
+ tia:['If the throw is on the other side, swap left and right.'],
+ tid:['If the throw is on the other side, swap left and right.'],
+ ca:['Short passes are easy to control.','The CB stays near halfway so a lost ball is not a goal against us.'],
+ pl:['Keep 6-7m between neighbours.','Short passes along the ground.','Move as a unit: LB, CB and RB step up together.'],
+ v321:['Pass wide first, then forward along the side.','Use the spare player: the CB marks their ST alone and LB/RB joins the CM.','ST1 and ST2 run into the gaps beside their LM and RM.','Never kick long down the middle.','Defending: the CB takes their ST. The CM and LB/RB take their LM and RM.','ST1 and ST2 block the middle and force the ball wide.'],
+ v2121:['Labels are from their side. Dotted lines show who marks whom.','Do not go through the middle.','Pull their CM to one side, then switch.','Run into the space behind their LM and RM.','Keep the CB and LB/RB back when the CM goes up.','Defending: the CB takes their ST, the LB takes their RM, the RB takes their LM, the CM takes their CM.'],
+ deep:['Drop ST2 back beside the CM. ST1 stays high.','No tackling. Stand 2m off the carrier and make her go wide.','Stay goal side of your player. The CB takes their forward.','When we win it, pass sideways or back.','Swap tired players early.'],
+ p321:['LB, CB and RB stay put. ST2 drops beside the CM.','ST1 plays alone up front. Stay high.','Short passes only. Kick it out to the side when pressed.','Win it, then keep it. Go forward only when ST1 is free.']
+};
+P.forEach(function(p){if(NOTES[p.id])p.notes=NOTES[p.id]});
 
 /* ---------- state ---------- */
 var cur=null,pos=[],k=0,selPos=store('pb-pos')||null,timer=null,anim=null,playing=false;
@@ -256,7 +286,7 @@ function buildPos(p){
 }
 function ballAt(j){
   var ref;
-  if(j===0)ref=cur.ball;else ref=cur.steps[j-1].pass[1];
+  ref=cur.ball;for(var i=j;i>=1;i--){if(cur.steps[i-1].pass){ref=cur.steps[i-1].pass[1];break}}
   if(ref===null||ref===undefined)return null;
   if(Array.isArray(ref))return ref.slice();
   var p=pos[j][ref];return [p[0]+2.1,p[1]-1.6];
@@ -352,21 +382,26 @@ function drawLayers(newest){
     var s=cur.steps[j-1],pre=pos[j-1];
     // runs
     for(var id in (s.mv||{})){
-      var a=pre[id],b=s.mv[id],q=seg(a,b,2.2,2.2);
+      var a=pre[id],b=s.mv[id],L0=Math.sqrt(Math.pow(b[0]-a[0],2)+Math.pow(b[1]-a[1],2)),tr=Math.min(2.0,L0*.3),q=seg(a,b,tr,tr);
+      if(j===k&&L0>3){mk('circle',{class:'ghost',cx:a[0],cy:Y(a[1]),r:1.9},gTr);var gt=mk('text',{class:'gtx',x:a[0],y:Y(a[1])},gTr);gt.textContent=id}
       mk('line',{class:'ar run'+(selPos===id?' mine':''),x1:q[0][0],y1:Y(q[0][1]),x2:q[1][0],y2:Y(q[1][1]),'marker-end':'url(#ah-'+(selPos===id?'acc':'ink')+')'},gTr);
+      if(j===k){var rl=mk('text',{class:'num'+(selPos===id?' mine':''),x:(q[0][0]+q[1][0])/2-q[3]*1.9,y:Y((q[0][1]+q[1][1])/2+q[2]*1.9)},gTr);rl.textContent='run';}
     }
+    if(!s.pass)continue;
     var pa=s.pass,from=pa[0]==='T'?[cur.opp[0][0],cur.opp[0][1],false]:resolve(pa[0],pre),to=resolve(pa[1],pre);
     var involved=(pa[0]===selPos||pa[1]===selPos);
-    function arrow(f,t,cls,num,side){
+    function arrow(f,t,cls,num,side,lab){
       var q=seg(f,t,f[2]?2.2:.4,t[2]?2.2:.4);
       var ln=mk('line',{class:'ar '+cls+(involved?' mine':'')+(newest&&j===k?' fade':''),x1:q[0][0],y1:Y(q[0][1]),x2:q[1][0],y2:Y(q[1][1]),'marker-end':'url(#ah-'+(involved?'acc':'ink')+')'},gAr);
-      if(num){
-        var mx=(f[0]+t[0])/2-q[3]*side*2.3,my=(f[1]+t[1])/2+q[2]*side*2.3;
-        var tx=mk('text',{class:'num'+(involved?' mine':''),x:mx,y:Y(my)},gAr);tx.textContent=num;
+      if(num||lab){
+        var mx=(f[0]+t[0])/2-q[3]*side*(lab?3.2:2.3),my=(f[1]+t[1])/2+q[2]*side*(lab?3.2:2.3);
+        var tx=mk('text',{class:'num'+(involved?' mine':''),x:mx,y:Y(my)},gAr);
+        if(num){var ts=mk('tspan',{class:'nn'},tx);ts.textContent=num+' '}
+        var tl=mk('tspan',{},tx);tl.textContent=lab||'';
       }
     }
-    arrow(from,to,s.dash?'run':'pass',pa[2]||0,pa[3]||1);
-    if(s.alt){arrow(resolve(s.alt[0],pre),resolve(s.alt[1],pre),'alt',0,1)}
+    arrow(from,to,s.dash?'run':'pass',pa[2]||0,pa[3]||1,j===k?(s.lab||(Array.isArray(pa[1])?'shoot':'pass to '+pa[1])):'');
+    if(s.alt){arrow(resolve(s.alt[0],pre),resolve(s.alt[1],pre),'alt',0,-1,j===k?'or back to '+s.alt[1]:'')}
   }
 }
 
@@ -433,7 +468,7 @@ function renderMine(){
   h+='<p class="job">'+(job?esc(job):'See the notes below for this shape.')+'</p>';
   var items=[];
   cur.steps.forEach(function(s,i){
-    var p=s.pass,line=null;
+    var p=s.pass||[],line=null;
     var num=p[2]?'Pass '+p[2]+': ':'';
     if(p[0]===selPos){line=num+'you pass to '+(Array.isArray(p[1])?'goal. Shoot.':p[1])+'.'}
     else if(p[1]===selPos){line=num+p[0]+' passes to you.'}
@@ -459,15 +494,8 @@ function renderAll(){
 function renderNotes(){
   var n=$('notes');
   if(!cur.notes){n.hidden=true;return}
-  var h='';
-  cur.notes.forEach(function(sec){
-    h+='<h3>'+esc(sec[0])+'</h3>';
-    if(typeof sec[1]==='string'){h+='<p style="margin:0 0 6px">'+esc(sec[1])+'</p>';return}
-    h+='<ul>';sec[1].forEach(function(it){
-      if(Array.isArray(it))h+='<li><b>'+esc(it[0])+'</b> '+esc(it[1])+'</li>';else h+='<li>'+esc(it)+'</li>';
-    });h+='</ul>';
-  });
-  n.innerHTML='<summary>Notes</summary>'+h;n.hidden=false;
+  n.innerHTML='<summary>Notes</summary><ul>'+cur.notes.map(function(t){return '<li>'+esc(t)+'</li>'}).join('')+'</ul>';
+  n.hidden=false;
 }
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
 function setSel(id){selPos=id;store('pb-pos',id||'');updateUI();drawLayers()}
