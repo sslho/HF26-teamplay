@@ -7,18 +7,12 @@
 <style>
 /* Layout concept: a coach's tactics board. Pitch on one side, the player's own job on the other; phone stacks them. */
 :root{
-  --bg:#eef2ef; --panel:#ffffff; --ink:#14211c; --muted:#56665e; --line:#d3dcd6;
-  --pitch:#ffffff; --chalk:#8a9a91; --opp:#1c2a24; --accent:#d9540f; --accent-ink:#ffffff; --soft:#fbe9df;
+  color-scheme:light;
+  --bg:#ffffff; --panel:#ffffff; --ink:#000000; --muted:#555555; --line:#cfcfcf;
+  --pitch:#ffffff; --chalk:#808080; --opp:#000000; --accent:#e8590c; --accent-ink:#ffffff; --soft:#fff0e6;
   --f-display:Arial,Helvetica,sans-serif; --f-body:Arial,Helvetica,sans-serif;
 }
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --bg:#0f1915; --panel:#17241e; --ink:#e7efe9; --muted:#9bada3; --line:#2b3b33;
-  --pitch:#17241e; --chalk:#5f7568; --opp:#0a110e; --accent:#ff8a4c; --accent-ink:#1a0d04; --soft:#3a2416; color-scheme:dark}}
-:root[data-theme="dark"]{
-  --bg:#0f1915; --panel:#17241e; --ink:#e7efe9; --muted:#9bada3; --line:#2b3b33;
-  --pitch:#17241e; --chalk:#5f7568; --opp:#0a110e; --accent:#ff8a4c; --accent-ink:#1a0d04; --soft:#3a2416; color-scheme:dark}
 *{box-sizing:border-box}
-html{color-scheme:light dark}
 body{margin:0}
 body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.45;
   padding-block:10px 28px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
@@ -32,7 +26,7 @@ button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 .grp{font:600 12px var(--f-display);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:8px 0 4px}
 .chips{display:flex;flex-wrap:wrap;gap:6px}
 .chip{font:500 14px var(--f-body);border:1.5px solid var(--line);background:var(--panel);color:var(--ink);border-radius:999px;padding:5px 12px;cursor:pointer}
-.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.chip[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
 .chip.pos[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
 .chip.pos{font:600 15px var(--f-display);letter-spacing:.04em;min-width:48px;padding:5px 10px}
 .main{display:grid;grid-template-columns:minmax(0,1fr);gap:14px;margin-top:12px}
@@ -48,7 +42,7 @@ button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 .dots i{width:9px;height:9px;border-radius:50%;background:var(--line);display:block}
 .dots i.on{background:var(--accent)}
 .cap{min-height:46px;margin:8px 2px 0;font-size:15px}
-.cap b{font:700 13px var(--f-display);letter-spacing:.1em;text-transform:uppercase;color:var(--accent);display:block}
+.cap b{font:700 13px var(--f-display);letter-spacing:.1em;text-transform:uppercase;color:var(--ink);display:block}
 .card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin-bottom:12px}
 .card h2{font:700 21px/1.1 var(--f-display);letter-spacing:.02em;margin:0 0 6px}
 .card h3{font:700 14px var(--f-display);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:0 0 6px}
@@ -75,12 +69,12 @@ summary{cursor:pointer;font:700 14px var(--f-display);letter-spacing:.1em;text-t
 .pl text{font:700 1.6px var(--f-body);fill:var(--ink);text-anchor:middle;dominant-baseline:central;pointer-events:none}
 .pl{cursor:pointer}
 .pl.dim{opacity:.7}
-.pl.sel circle{fill:var(--accent);stroke:var(--ink)}
+.pl.sel circle{fill:var(--accent);stroke:var(--accent)}
 .pl.sel text{fill:var(--accent-ink)}
-.opp circle{fill:#9aa6a0;stroke:#9aa6a0}
+.opp circle{fill:#8c8c8c;stroke:#8c8c8c}
 .opp text{font:700 1.5px var(--f-body);fill:#fff;text-anchor:middle;dominant-baseline:central}
 .ball{fill:#fff;stroke:#111;stroke-width:.35}
-.ar{stroke:var(--ink);stroke-width:.34;fill:none}
+.ar{stroke:var(--accent);stroke-width:.34;fill:none}
 .ar.run,.ar.alt{stroke-dasharray:1.1 .8;stroke-width:.28}
 .ar.mine{stroke:var(--accent);stroke-width:.5}
 .ar.fade{animation:fd .5s ease both}
@@ -135,7 +129,7 @@ summary{cursor:pointer;font:700 14px var(--f-display);letter-spacing:.1em;text-t
       <div>
         <div id="mine"></div>
         <details class="card notes" id="notes" hidden></details>
-        <div class="card"><details><summary>Everyone's jobs in this play</summary><table class="alljobs" id="alljobs"></table></details></div>
+        <div class="card"><details><summary>Everyone's roles in this play</summary><table class="alljobs" id="alljobs"></table></details></div>
       </div>
     </div>
   </section>
@@ -375,6 +369,35 @@ P.forEach(function(p){if(NOTES[p.id])p.notes=NOTES[p.id]});
 /* what each position does once the team is in the 3-2-1 */
 P.filter(function(p){return p.id==='sw'})[0].after=P.filter(function(p){return p.id==='p321'})[0].jobs;
 
+/* role summaries for the "everyone" list: the principle of each role, not the steps */
+var STAY='Stay home. Do not push up.',KEEPS='Stay central as the last option.';
+var TIB={GK:KEEPS,CB:'Stay 5-6m behind the CM as the safe option.',LB:'Throw or receive on your side. Otherwise tuck in toward the middle.',RB:'Throw or receive on your side. Otherwise tuck in toward the middle.'};
+var TDB={GK:'Stay central. Watch for a ball over the top.',CB:'Hold the middle.',LB:'Mark the receiver on your side, 2-3m off. Otherwise tuck in.',RB:'Mark the receiver on your side, 2-3m off. Otherwise tuck in.',CM:'Second marker on the ball side.'};
+var CAB={GK:'Stay in goal.',CB:'Hold near halfway to stop a counter.',LB:'Nearest the corner: wait close for the short pass. Otherwise stay back.',RB:'Nearest the corner: wait close for the short pass. Otherwise stay back.'};
+var CDB={GK:'Stay in the middle of the goal.',CB:'Mark the most dangerous attacker.',LB:'Hold the post on your side. Clear wide.',RB:'Hold the post on your side. Clear wide.',CM:'Edge of the box for the clearance and cutback.'};
+function mix(a,b){var o={},k;for(k in a)o[k]=a[k];for(k in b)o[k]=b[k];return o}
+var PR={
+ ko:{GK:'Stay in the box.',CB:'Step up with the team. Stay central as the safe back option.',LB:'Step up the left side. Be the switch option.',RB:'Take the first short pass and pass up the right.',CM:'The link. Pass wide, then step up to give a wall pass.',ST1:'Kick off back, then run through the middle to finish.',ST2:'Take the wide pass, play inside, then run past to the wing.'},
+ gk:{GK:'Roll short to a fullback. Stay on the line.',CB:'Step up and be the safe pass back.',LB:'Receive wide in the box corner and pass to the CM. Kick it out to the side if pressed.',RB:'Step up the right side as the next option.',CM:'Take the pass, play it forward, then step up for the return.',ST1:'Drop low to receive, lay it back, then run through the middle.',ST2:'Wait high on the right and play inside.'},
+ tia:mix(TIB,{CM:'First receiver. Pass to ST1, or back to the CB.',ST1:'Stay high. Drop 5m if the CM needs an option.',ST2:'Stay high.'}),
+ tid:mix(TDB,{ST1:'Drop to halfway as the outlet.',ST2:'Stay high.'}),
+ ca:mix(CAB,{CM:'Run to the near post as the passing link.',ST1:'Take the corner short, then follow to the edge of the box.',ST2:'Arrive on the penalty spot to shoot.'}),
+ cd:mix(CDB,{ST1:'Block the short pass at the corner.',ST2:'Hold at halfway as the outlet.'}),
+ k321:{GK:'Stay in the box.',CB:'Stay central and deep.',LB:STAY,RB:STAY,CM:'Take the first pass and spread it to ST2.',ST2:'Receive, pass forward, then run wide to support.',ST1:'Kick off back, hold the ball up front, then finish.'},
+ g321:{GK:'Roll short to the LB.',CB:'Stay central and deep.',LB:'Receive wide and pass to the CM.',RB:STAY,CM:'Link the ball forward to ST1.',ST2:'Support ST1, then take the lay-off.',ST1:'Hold the ball up, lay it off, then run through.'},
+ ta321:mix(TIB,{CM:'First receiver. Pass to ST2, or back to the CB.',ST2:'Stand about 6m from the CM as the next option.',ST1:'Stay high.'}),
+ td321:mix(TDB,{ST2:'Mark the second attacker, goal side.',ST1:'Stay high as the outlet.'}),
+ ca321:mix(CAB,{CM:'Run to the near post as the passing link.',ST2:'Take the corner short, then follow to the edge of the box.',ST1:'Arrive on the penalty spot to shoot.'}),
+ cd321:mix(CDB,{ST2:'Block the short pass at the corner.',ST1:'Hold at halfway as the outlet.'}),
+ pl:{GK:'Middle of the goal, 6-7m behind the CB.',CB:'Centre, in front of goal.',LB:'6-7m to the left of the CB, level with her.',RB:'6-7m to the right of the CB, level with her.',CM:'6-7m ahead of the CB, between the LB and RB.',ST1:'About 6m ahead of the CM, 8m from ST2. Stay high.',ST2:'About 6m ahead of the CM, 8m from ST1. Stay high.'},
+ sw:{GK:'No change. Stay central.',CB:'No change. Stay in the middle of the back three.',LB:'No change. In the 3-2-1, stay home.',RB:'No change. In the 3-2-1, stay home.',CM:'Shift across to make a midfield pair with ST2.',ST2:'Drop back to make a midfield pair with the CM.',ST1:'Become the lone striker.'},
+ fb:{GK:'Stay in the box.',CB:'Safe back option for both fullbacks.',LB:'Ball on your side: step up. Ball on the other side: tuck in beside the CB.',RB:'Ball on your side: step up. Ball on the other side: tuck in beside the CB.',CM:'Switch point between the two sides.',ST1:'Stay high.',ST2:'Stay high.'},
+ v321:{GK:'Pass wide. Never kick long down the middle.',CB:'Mark their ST alone, goal side.',LB:'Cover their RM when defending. May join the CM when we attack.',RB:'Cover their LM when defending. May join the CM when we attack.',CM:'Cover one of their wide midfielders.',ST1:'Run into the gap beside their LM or RM. Block the middle when defending.',ST2:'Run into the gap beside their LM or RM. Block the middle when defending.'},
+ v2121:{GK:'Stay central. Watch for a ball over the top.',CB:'Mark their ST, goal side.',LB:'Mark their RM.',RB:'Mark their LM.',CM:'Mark their CM. Pull her to one side, then switch.',ST1:'Block the pass into the middle and force the ball wide.',ST2:'Block the pass into the middle and force the ball wide.'},
+ deep:{GK:'Stay central. Watch for a ball over the top.',CB:'Mark their forward, goal side.',LB:'Mark the wide player on your side. Show her wide.',RB:'Mark the wide player on your side. Show her wide.',CM:'Slow the carrier and make her go wide.',ST2:'Drop back beside the CM.',ST1:'Stay high as the outlet.'},
+ p321:{GK:'Stay central. Short passes only.',CB:'Stay central and deep.',LB:STAY,RB:STAY,CM:'Be the hub. Win it, then keep it.',ST2:'Midfielder beside the CM. Support ST1 when it is safe.',ST1:'Lone striker. Stay high and hold the ball up.'}
+};
+
 /* position guidance that applies in every play */
 var ALWAYS={GK:['Stand in the middle of the goal, 1-2m off the line.','Shift with the ball to stay between it and the middle of the goal.','Come to the edge of the box for balls over the top.','Get both hands behind the shot. Hold it, or push it wide.','Roll or throw short to LB/RB. Never kick long down the middle.','If pressed, kick it out to the side.']};
 
@@ -493,7 +516,7 @@ function drawLayers(newest){
     for(var id in (s.mv||{})){
       var a=pre[id],b=s.mv[id],L0=Math.sqrt(Math.pow(b[0]-a[0],2)+Math.pow(b[1]-a[1],2)),tr=Math.min(2.0,L0*.3),q=seg(a,b,tr,tr);
       if(j===k&&L0>3){mk('circle',{class:'ghost',cx:a[0],cy:Y(a[1]),r:1.9},gTr);var gt=mk('text',{class:'gtx',x:a[0],y:Y(a[1])},gTr);gt.textContent=id}
-      mk('line',{class:'ar run'+(selPos===id?' mine':''),x1:q[0][0],y1:Y(q[0][1]),x2:q[1][0],y2:Y(q[1][1]),'marker-end':'url(#ah-'+(selPos===id?'acc':'ink')+')'},gTr);
+      mk('line',{class:'ar run'+(selPos===id?' mine':''),x1:q[0][0],y1:Y(q[0][1]),x2:q[1][0],y2:Y(q[1][1]),'marker-end':'url(#ah-acc)'},gTr);
       if(j===k&&L0>3){var rl=mk('text',{class:'num'+(selPos===id?' mine':''),x:(q[0][0]+q[1][0])/2+q[3]*1.9,y:Y((q[0][1]+q[1][1])/2-q[2]*1.9)},gTr);rl.textContent='run';}
     }
     if(!s.pass)continue;
@@ -501,7 +524,7 @@ function drawLayers(newest){
     var involved=(pa[0]===selPos||pa[1]===selPos);
     function arrow(f,t,cls,num,side,lab){
       var q=seg(f,t,f[2]?2.2:.4,t[2]?2.2:.4);
-      var ln=mk('line',{class:'ar '+cls+(involved?' mine':'')+(newest&&j===k?' fade':''),x1:q[0][0],y1:Y(q[0][1]),x2:q[1][0],y2:Y(q[1][1]),'marker-end':'url(#ah-'+(involved?'acc':'ink')+')'},gAr);
+      var ln=mk('line',{class:'ar '+cls+(involved?' mine':'')+(newest&&j===k?' fade':''),x1:q[0][0],y1:Y(q[0][1]),x2:q[1][0],y2:Y(q[1][1]),'marker-end':'url(#ah-acc)'},gAr);
       if(num||lab){
         var mx=(f[0]+t[0])/2-q[3]*side*(lab?3.2:2.3),my=(f[1]+t[1])/2+q[2]*side*(lab?3.2:2.3);
         var tx=mk('text',{class:'num'+(involved?' mine':''),x:mx,y:Y(my)},gAr);
@@ -585,8 +608,9 @@ function renderMine(){
 }
 function renderAll(){
   var t=$('alljobs'),h='';
-  if(!cur.jobs){t.innerHTML='<tr><td>No per-position list for this shape. See the notes.</td></tr>';return}
-  POS.forEach(function(id){if(!pos[0][id])return;h+='<tr'+(id===selPos?' class="sel"':'')+'><th>'+id+'</th><td>'+lines(cur.jobs[id]||'')+(cur.after?'<span class="ln"><b>Then, in the 3-2-1:</b></span>'+lines(cur.after[id]||''):'')+'</td></tr>'});
+  var src=PR[cur.id]||cur.jobs;
+  if(!src){t.innerHTML='<tr><td>No per-position list for this shape. See the notes.</td></tr>';return}
+  POS.forEach(function(id){if(!src[id])return;h+='<tr'+(id===selPos?' class="sel"':'')+'><th>'+id+'</th><td>'+esc(src[id])+'</td></tr>'});
   t.innerHTML=h;
 }
 function renderNotes(){
