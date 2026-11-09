@@ -24,6 +24,8 @@ nav.tabs button{font:600 17px var(--f-display);letter-spacing:.05em;text-transfo
 nav.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
 button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 .grp{font:600 12px var(--f-display);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:8px 0 4px}
+.chips[hidden]{display:none}
+.chip[hidden]{display:none}
 .chips{display:flex;flex-wrap:wrap;gap:6px}
 .chip{font:500 14px var(--f-body);border:1.5px solid var(--line);background:var(--panel);color:var(--ink);border-radius:999px;padding:5px 12px;cursor:pointer}
 .chip[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
@@ -111,9 +113,14 @@ summary{cursor:pointer;font:700 14px var(--f-display);letter-spacing:.1em;text-t
       <h3>I play</h3>
       <div class="chips" id="c-pos"></div>
     </div>
-    <div class="grp">3-1-2 plays</div><div class="chips" id="c-set"></div>
-    <div class="grp">3-2-1 plays</div><div class="chips" id="c-321"></div>
-    <div class="grp">Shapes and opponents</div><div class="chips" id="c-shape"></div>
+    <div class="card" style="margin-bottom:10px">
+      <h3>Playing shape</h3>
+      <div class="chips" id="c-grp"></div>
+    </div>
+    <div class="chips" id="c-set"></div>
+    <div class="chips" id="c-321" hidden></div>
+    <div class="chips" id="c-231" hidden></div>
+    <div class="chips" id="c-shape" hidden></div>
     <div class="main">
       <div>
         <div class="board" id="board"><svg id="svg" role="img" aria-label="Pitch diagram"></svg></div>
@@ -138,7 +145,8 @@ summary{cursor:pointer;font:700 14px var(--f-display);letter-spacing:.1em;text-t
 
 <script>
 (function(){
-var POS=['GK','LB','CB','RB','CM','ST1','ST2'];
+var POS=['GK','LB','CB','RB','LM','CM','RM','ST','ST1','ST2'];
+var POS312=['GK','LB','CB','RB','CM','ST1','ST2'],POS231=['GK','LB','RB','LM','CM','RM','ST'];
 var NS='http://www.w3.org/2000/svg';
 var reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion:reduce)').matches;
 function $(i){return document.getElementById(i)}
@@ -213,7 +221,7 @@ P.push({id:'cd',grp:'set',name:'Corner kick: defend',half:true,jobs:CD,
  {t:'They cross into the middle. ST1 stands 4-5m from the taker to block the short pass.',lab:'cross',pass:['T',[20.5,9.5],0,1]},
  {t:'The defence clears wide. The CM takes any clearance or cutback. ST2 waits at halfway.',lab:'clear wide',pass:['CB',[36,15],0,1]}]});
 
-P.push({id:'pl',grp:'shape',name:'Starting 3-1-2',half:false,jobs:PJ,
+P.push({id:'pl',grp:'set',name:'Starting shape',half:false,jobs:PJ,
  players:{GK:[20,2],LB:[13,9],CB:[20,9],RB:[27,9],CM:[20,16],ST1:[16,22],ST2:[24,22]},opp:[],ball:null,
  dims:[[[14.9,9],[18.1,9],'6-7m',[0,2]],[[21.9,9],[25.1,9],'6-7m',[0,2]],[[20,3.9],[20,7.1],'6-7m',[3.2,0]],[[20,10.9],[20,14.1],'6-7m',[3.2,0]],[[17.9,22],[22.1,22],'8m',[0,2]]],
  notes:[['Spacing',['Keep 6-7m between neighbours. Short passes along the ground are the whole plan.','The team moves as a unit: when the ball goes forward, the fullbacks and CB step up together.']]],steps:[]});
@@ -236,7 +244,7 @@ P.push({id:'fb',grp:'shape',name:'3-1-2 Fullbacks: up and tuck in',half:false,
  {t:'CB passes to the RB, who is now the one up.',pass:['CB','RB',4,-1]},
  {t:'RB passes forward to ST2.',pass:['RB','ST2',5,1]}]});
 
-P.push({id:'v321',grp:'shape',name:'Against a 3-2-1',half:false,jobs:null,
+P.push({id:'v321',grp:'set',name:'Against a 3-2-1',half:false,jobs:null,
  players:{GK:[20,2],CB:[20,14],LB:[8,26],RB:[32,18],CM:[15,21],ST1:[15,28],ST2:[29,27]},
  opp:[[20,47,'GK'],[8,41,'RB'],[20,41,'CB'],[32,41,'LB'],[13,33,'RM'],[27,33,'LM'],[20,28,'ST']],ball:'CM',
  notes:[['When we attack',[['Play around them, not through them.','Their five outfield players crowd the middle, so pass wide first (1), then forward along the side (2).'],['Use the spare player.','They have one ST, so our CB can mark her alone and one fullback can join the midfield.'],['Strikers run into the gaps beside their LM and RM,','not into the middle where their three at the back wait.'],['Never kick long down the middle.','Their three at the back win it.']]],
@@ -245,7 +253,7 @@ P.push({id:'v321',grp:'shape',name:'Against a 3-2-1',half:false,jobs:null,
  {t:'CM passes wide to the LB. ST1 starts running to the gap beside their RM.',pass:['CM','LB',1,1],mv:{ST1:[4,37]}},
  {t:'LB passes forward along the side to ST1.',pass:['LB','ST1',2,1]}]});
 
-P.push({id:'v2121',grp:'shape',name:'Against a 2-1-2-1',half:false,jobs:VJ,
+P.push({id:'v2121',grp:'set',name:'Against a 2-1-2-1',half:false,jobs:VJ,
  players:{GK:[20,2],CB:[20,13],LB:[10,16],RB:[30,16],CM:[20,28],ST1:[12,34],ST2:[28,34]},
  opp:[[20,47,'GK'],[14,41,'RB'],[26,41,'LB'],[20,35,'CM'],[7,30,'RM'],[33,30,'LM'],[20,22,'ST']],ball:null,
  marks:[['CB',6],['LB',4],['RB',5],['CM',3],['ST1',1],['ST2',2]],steps:[],
@@ -259,7 +267,7 @@ P.push({id:'deep',grp:'shape',name:'When we are outplayed',half:false,jobs:DJ,
  marks:[['CB',0],['LB',1],['RB',2]],steps:[],
  notes:[['The deep 3-2-1',[['Drop ST2 back beside the CM.','The back three stay close to our penalty area. ST1 stays high as the outlet. Keep gaps at 6-7m.'],['No tackling: do not try to take the ball.','Stand 2m off the carrier, side on, between her and goal. Make her go wide. The pass is where we win it.'],['Mark a player and stand goal side.','Our CB takes their forward even if she waits near our goal. There is no offside.'],['When we win it,','pass sideways or back to a safe teammate. Clear wide of their forward, or kick it out to the side when pressed.'],['Swap tired players early.','Aim to lose by fewer goals, then win the next 5 minutes.']]]]});
 
-P.push({id:'p321',grp:'shape',name:'Our defensive 3-2-1',half:false,
+P.push({id:'p321',grp:'z',name:'Starting shape',half:false,
  jobs:{GK:'Roll short to a fullback. Stay central.',CB:'Stay central and deep. You are the safe back option.',LB:'Stay level with the CB. Do not push up. Kick it out to the side if pressed.',RB:'Stay level with the CB. Do not push up. Kick it out to the side if pressed.',CM:'Be the hub. Take the pass, then play it to ST1 or out wide.',ST1:'You are alone up front. Stay high, hold the ball and lay it off to ST2.',ST2:'Play beside the CM. Support ST1 only when it is safe, then come back.'},
  players:{GK:[20,2],LB:[13,9],CB:[20,9],RB:[27,9],CM:[20,16],ST1:[16,22],ST2:[24,22]},opp:[],ball:'GK',
  notes:[['What changes from the 3-1-2',[['The back three do not move.','GK, LB, CB and RB stay exactly where they are.'],['ST2 drops back beside the CM.','Now there are two midfielders across the middle, about 10m apart.'],['ST1 stays up as the only striker.','She moves to the middle and holds the ball. There is no offside.']]],['The rules',[['The back three stay home.','The fullbacks do not go up. Last time the gaps behind them were the problem.'],['Two CMs, one striker.','The CMs stay about 10m apart and close the middle. The striker stays high, and there is no offside.'],['Short passes only.','No long kicks down the middle. Kick it out to the side when pressed.'],['Win it, then keep it.','Pass sideways or back first. Go forward only when the striker is free.']]]],
@@ -271,6 +279,111 @@ P.push({id:'p321',grp:'shape',name:'Our defensive 3-2-1',half:false,
  {t:'ST1 lays it off to ST2 and runs up the middle.',pass:['ST1','ST2',4,1],mv:{ST1:[20,33]}},
  {t:'ST2 passes through to ST1.',pass:['ST2','ST1',5,-1]},
  {t:'ST1 shoots.',pass:['ST1',[20,45],6,1],dash:1}]});
+
+
+/* ---------- the same two opponents, played from our 3-2-1 ---------- */
+var VZ={GK:'Pass wide. Never kick long down the middle.',CB:'Take their ST. Stay close and goal side.',LB:'Stay home. Take the first pass from the CB.',RB:'Stay home. Take the first pass from the CB.',CM:'Stay beside ST2. Take one of their wide midfielders.',ST2:'Stay beside the CM. Run into the space behind their wide midfielder.',ST1:'Stay high alone. Run into the gap between their wide midfielders.'};
+P.push({id:'v321z',grp:'z',name:'Against a 3-2-1',half:false,jobs:VZ,
+ players:{GK:[20,2],CB:[20,14],LB:[10,12],RB:[30,12],CM:[14,22],ST2:[26,22],ST1:[20,34]},
+ opp:[[20,47,'GK'],[8,41,'RB'],[20,41,'CB'],[32,41,'LB'],[13,33,'RM'],[27,33,'LM'],[20,27,'ST']],ball:'CB',
+ notes:[],
+ steps:[
+ {t:'CB passes wide to the RB. The back three stay home.',pass:['CB','RB',1,1]},
+ {t:'RB passes to ST2, who runs into the space behind their LM.',pass:['RB','ST2',2,1],mv:{ST2:[30,31]}},
+ {t:'ST2 passes inside to ST1, who has run into the gap between their wide midfielders.',pass:['ST2','ST1',3,1],mv:{ST1:[20,36]}},
+ {t:'ST1 shoots.',pass:['ST1',[20,45],4,1],dash:1}]});
+P.push({id:'v2121z',grp:'z',name:'Against a 2-1-2-1',half:false,
+ players:{GK:[20,2],CB:[20,13],LB:[10,16],RB:[30,16],CM:[16,27],ST2:[24,27],ST1:[20,38.5]},
+ opp:[[20,47,'GK'],[14,41,'RB'],[26,41,'LB'],[20,35,'CM'],[7,30,'RM'],[33,30,'LM'],[20,22,'ST']],ball:null,
+ marks:[['CB',6],['LB',4],['RB',5],['CM',3],['ST2',3]],steps:[],
+ notes:[],jobs:{GK:'Stay central. Watch for a ball over the top.',CB:'Take their ST, goal side.',LB:'Take their RM. Stay home when we attack.',RB:'Take their LM. Stay home when we attack.',CM:'Take their CM with ST2. Pull her to one side, then switch.',ST2:'Take their CM with the CM. Then run into the space behind their wide midfielder.',ST1:'Stay high between their two backs. Block the pass to them and force the ball wide.'}});
+
+/* ---------- 2-3-1: LB and RB at the back, LM, CM and RM in midfield, one ST ---------- */
+var MB={GK:[20,2],LB:[16,9],RB:[24,9],LM:[10,17],CM:[20,17],RM:[30,17],ST:[20,25]};
+P.push({id:'m_pl',grp:'m',name:'Starting shape',half:false,
+ jobs:{GK:'On the goal line, in the middle of the goal. Roll short to a fullback.',LB:'Left of centre, 8m from the RB, level with the top of the box. Stay home and be the safe pass back.',RB:'Right of centre, 8m from the LB, level with the top of the box. Stay home and be the safe pass back.',LM:'Left side, level with the CM and 10m from her. Run the sideline when we attack. Drop into the line when we defend.',CM:'Centre, 8m ahead of the LB and RB. Be the hub: take the pass and play it wide. Block the middle when we defend.',RM:'Right side, level with the CM and 10m from her. Run the sideline when we attack. Drop into the line when we defend.',ST:'About 8m ahead of the CM. Stay high, hold the ball and lay it off.'},
+ players:MB,opp:[],ball:null,
+ dims:[[[17.9,9],[22.1,9],'8m',[0,2]],[[11.9,17],[18.1,17],'10m',[0,2]],[[21.9,17],[28.1,17],'10m',[0,2]],[[20,19],[20,23],'8m',[3.2,0]]],
+ steps:[]});
+
+P.push({id:'m_sw',grp:'m',name:'Attacking and defending',half:false,
+ jobs:{GK:'Stay in the box.',LB:'Stay home in both. You are the safe pass back.',RB:'Stay home in both. You are the safe pass back.',LM:'Attack: run the sideline, up to 10m ahead of the CM. Defend: drop into the line, 7m from the CM.',CM:'Attack: step up as the hub. Defend: drop back and block the middle.',RM:'Attack: run the sideline, up to 10m ahead of the CM. Defend: drop into the line, 7m from the CM.',ST:'Attack: stay high. Defend: drop to halfway and block the pass out.'},
+ players:MB,opp:[],ball:null,
+ steps:[
+ {t:'We have the ball. The CM steps up, LM and RM run up the sides and the ST stays high. LB and RB stay home.',mv:{CM:[20,25],LM:[6,30],RM:[34,30],ST:[20,36]}},
+ {t:'We lose the ball. LM, CM and RM drop into one tight line, 7m apart, in front of LB and RB. The ST drops to halfway.',mv:{CM:[20,16],LM:[13,16],RM:[27,16],ST:[20,26]}}]});
+
+P.push({id:'m_ko',grp:'m',name:'Kick-off after a goal',half:false,
+ jobs:{GK:'Stay in the box.',LB:'Stay home. Be the safe pass back.',RB:'Stay home. Be the safe pass back.',LM:'Run up the left side to give width.',CM:'Take pass 1, pass wide to the RM (2). Step up as a link.',RM:'Take pass 2 and run up the right. Pass inside to the ST (3).',ST:'Kick off back to the CM (1). Run through the middle, take pass 3 and shoot (4).'},
+ players:{GK:[20,2],LB:[16,10],RB:[24,10],LM:[9,20],CM:[20,18],RM:[31,20],ST:[20,25]},
+ opp:[[10,33],[16,41],[31,42],[38,30],[5,38],[20,47]],ball:'ST',
+ steps:[
+ {t:'ST kicks off back to the CM.',pass:['ST','CM',1,-1]},
+ {t:'CM passes wide to the RM, who runs up the right. ST runs through the middle and LM runs up the left.',pass:['CM','RM',2,-1],mv:{CM:[22,27],ST:[21,33],RM:[32,29],LM:[8,28]}},
+ {t:'RM passes inside to the ST.',pass:['RM','ST',3,1]},
+ {t:'ST shoots.',pass:['ST',[22.6,45.2],4,-1],dash:1}]});
+
+P.push({id:'m_gk',grp:'m',name:'Goal kick',half:false,
+ jobs:{GK:'Roll short to the LB (1). Stay on the goal line.',LB:'Wait in the box corner. Take pass 1, pass to the CM (2). If pressed, kick it out to the side.',RB:'Stay home as the switch option.',LM:'Run up the left. Take pass 3, pass forward to the ST (4).',CM:'Take pass 2, pass wide to the LM (3). Step up, take the lay-off (5), pass to the RM (6).',RM:'Run up the right. Take pass 6, pass to the ST (7).',ST:'Take pass 4 and lay it back to the CM (5). Run through the middle, take pass 7 and shoot (8).'},
+ players:{GK:[20,2],LB:[14,5],RB:[26,5],LM:[8,12],CM:[20,12],RM:[32,12],ST:[14,20]},
+ opp:[[4,27],[22,23],[34,32],[12,40],[27,40],[20,47]],ball:'GK',
+ steps:[
+ {t:'GK rolls a short pass to the LB.',pass:['GK','LB',1,1]},
+ {t:'LB passes to the CM.',pass:['LB','CM',2,1]},
+ {t:'CM passes wide to the LM, who runs up the left.',pass:['CM','LM',3,1],mv:{LM:[8,20]}},
+ {t:'LM passes forward to the ST, who has run to the left of the middle.',pass:['LM','ST',4,1],mv:{ST:[13,29]}},
+ {t:'ST lays it back to the CM, who steps up.',pass:['ST','CM',5,-1],mv:{CM:[17,22]}},
+ {t:'CM passes wide to the RM, who has run up the right. ST runs through the middle.',pass:['CM','RM',6,1],mv:{RM:[32,28],ST:[20,37]}},
+ {t:'RM passes to the ST.',pass:['RM','ST',7,1]},
+ {t:'ST shoots.',pass:['ST',[20,45.5],8,1],dash:1}]});
+
+P.push({id:'m_tia',grp:'m',name:'Throw-in: attack',half:true,
+ jobs:{GK:'Stay central. Last-resort back option.',LB:'Stand 5-6m behind the CM as the safe option.',RB:'Stay home. Tuck in toward the middle.',LM:"Throw on the left: throw short to the CM's feet (1). Throw on the right: move in toward the middle.",CM:'Come 5m from the thrower and take the throw. Pass to the ST if she is free, otherwise back to the LB (2).',RM:"Throw on the right: take it, short to the CM's feet. Throw on the left: move in toward the middle.",ST:'Stay high. Drop 5m to take a pass from the CM.'},
+ players:{GK:[20,2],LB:[14,8],RB:[26,8],LM:[0.8,17],CM:[8,15.5],RM:[30,18],ST:[14,26]},opp:[],ball:'LM',
+ steps:[
+ {t:"LM throws short to the CM's feet.",pass:['LM','CM',1,1]},
+ {t:'CM passes to the ST if she is free. If not, back to the LB.',pass:['CM','ST',2,1],alt:['CM','LB']}]});
+
+P.push({id:'m_tid',grp:'m',name:'Throw-in: defend',half:true,
+ jobs:{GK:'Stay central. Watch for a ball over the top.',LB:'Stay in front of goal. Block the middle.',RB:'Stay in front of goal. Move toward the ball side.',LM:'Throw on the left: mark the receiver 2-3m off, goal side. Throw on the right: move in toward the middle.',CM:'Move to the ball side as the second marker.',RM:'Throw on the right: mark the receiver 2-3m off, goal side. Throw on the left: move in toward the middle.',ST:'Drop back to halfway as an outlet.'},
+ players:{GK:[20,2],LB:[17,9],RB:[26,9],LM:[6.5,14],CM:[13.5,15],RM:[28,17],ST:[20,27]},
+ opp:[[0.5,16,'T'],[9,17.5],[9,23]],ball:[0.5,16],
+ steps:[
+ {t:'They throw to a teammate. LM closes her down, 2-3m off and goal side. CM moves to the ball side as the second marker.',lab:'throw',pass:['T',[9,17.5],0,1],mv:{LM:[7.5,14.5],CM:[11.5,15.5]}}]});
+
+P.push({id:'m_ca',grp:'m',name:'Corner kick: attack',half:true,
+ jobs:{GK:'Stay in goal.',LB:'Wait 5m from the taker. Take pass 1, pass to the CM (2).',RB:'Stay near halfway to stop a counter.',LM:'Take the corner: short pass to the LB (1). Follow in to the edge of the box.',CM:'Run to the near post. Take pass 2, pass to the ST (3).',RM:'Stay near halfway with the RB.',ST:'Run to the penalty spot. Take pass 3 and shoot (4).'},
+ players:{LM:[0.9,0.9],LB:[6.5,5.5],RB:[20,26],CM:[24,15],RM:[28,24],ST:[30,12]},
+ opp:[[20,1.8,'GK'],[13,13.5],[27,6]],ball:'LM',
+ steps:[
+ {t:'LM passes short to the LB. The CM runs to the near post.',pass:['LM','LB',1,-1],mv:{CM:[14,8]}},
+ {t:'LB passes to the CM. The ST runs to the penalty spot.',pass:['LB','CM',2,-1],mv:{ST:[23,10.5]}},
+ {t:'CM passes to the ST.',pass:['CM','ST',3,-1]},
+ {t:'ST shoots.',pass:['ST',[20.8,3.6],4,1],dash:1}]});
+
+P.push({id:'m_cd',grp:'m',name:'Corner kick: defend',half:true,
+ jobs:{GK:'Stay in the middle of the goal.',LB:'Take the post on your side. Stop low shots. Clear wide.',RB:'Take the post on your side. Stop low shots. Clear wide.',LM:'Stand 4-5m from the taker to block the short pass.',CM:'Mark the most dangerous attacker in front of goal.',RM:'Stand on the edge of the box. Take the clearance and any cutback.',ST:'Stay at halfway as an outlet.'},
+ players:{GK:[20,1.8],LB:[15.8,2.2],RB:[24.2,2.2],LM:[6.5,5],CM:[20,5.5],RM:[28,13],ST:[22,28]},
+ opp:[[0.8,0.8,'T'],[12,6],[20.5,9.5],[26,5]],ball:[0.8,0.8],
+ steps:[
+ {t:'They cross into the middle. LM stands 4-5m from the taker to block the short pass.',lab:'cross',pass:['T',[20.5,9.5],0,1]},
+ {t:'The defence clears wide. The RM takes any clearance or cutback. ST waits at halfway.',lab:'clear wide',pass:['CM',[36,15],0,1]}]});
+
+P.push({id:'m_v321',grp:'m',name:'Against a 3-2-1',half:false,
+ jobs:{GK:'Pass wide. Never kick long down the middle.',LB:'Mark their ST alone, goal side. Stay home when we attack.',RB:'Cover behind the LB. Stay home.',LM:'Mark their RM when defending. Run up the left when we attack.',CM:'Take pass 1, pass wide to the RM (2). You are the spare player in the middle.',RM:'Mark their LM when defending. Take pass 2 and pass inside to the ST (3).',ST:'Run into the gap between their wide midfielders. Take pass 3 and shoot (4).'},
+ players:{GK:[20,2],LB:[15,12],RB:[25,12],LM:[9,22],CM:[20,21],RM:[31,22],ST:[20,34]},
+ opp:[[20,47,'GK'],[8,41,'RB'],[20,41,'CB'],[32,41,'LB'],[13,33,'RM'],[27,33,'LM'],[20,28,'ST']],ball:'LB',
+ steps:[
+ {t:'LB passes to the CM.',pass:['LB','CM',1,1]},
+ {t:'CM passes wide to the RM, who has run up the right.',pass:['CM','RM',2,-1],mv:{RM:[32,29]}},
+ {t:'RM passes inside to the ST, who has run into the gap between their wide midfielders.',pass:['RM','ST',3,1],mv:{ST:[21,35]}},
+ {t:'ST shoots.',pass:['ST',[20,45],4,1],dash:1}]});
+
+P.push({id:'m_v2121',grp:'m',name:'Against a 2-1-2-1',half:false,
+ jobs:{GK:'Stay central. Watch for a ball over the top.',LB:'Take their ST, goal side. Stay home when we attack.',RB:'Cover behind the LB.',LM:'Take their RM.',CM:'Take their CM. Pull her to one side, then switch.',RM:'Take their LM.',ST:'Stay high between their two backs. Block the pass to them and force the ball wide.'},
+ players:{GK:[20,2],LB:[15,13],RB:[25,13],LM:[8,23],CM:[20,28],RM:[32,23],ST:[20,38.5]},
+ opp:[[20,47,'GK'],[14,41,'RB'],[26,41,'LB'],[20,35,'CM'],[7,30,'RM'],[33,30,'LM'],[20,22,'ST']],ball:null,
+ marks:[['LB',6],['LM',4],['RM',5],['CM',3]],steps:[]});
 
 /* ---------- 3-2-1 set plays: ST2 plays beside the CM, ST1 is the only striker ---------- */
 var K3={GK:'Stay in the box.',CB:'Stay central and deep. You are the safe back option.',LB:'Stay home. Do not push up.',RB:'Stay home. Do not push up.',CM:'Take pass 1, pass to ST2 (2).',ST2:'Take pass 2, pass forward to ST1 (3). Run wide, take pass 4, pass inside to ST1 (5).',ST1:'Kick off back to the CM (1). Move up, take pass 3, lay it off to ST2 (4). Run up the middle, take pass 5, shoot (6).'};
@@ -364,6 +477,12 @@ var NOTES={
   ['CB','Stay central and deep.'],['LB','Stay home. Do not push up.'],['RB','Stay home. Do not push up.'],
   ['CM','Be the hub. Win it, then keep it.'],['ST2','Drop back beside the CM. Support ST1 only when it is safe.'],['ST1','Play alone up front. Stay high. Go forward only when you are free.']]
 };
+NOTES.v321z=[['All','Pass wide first, then forward along the side. Never kick long down the middle.'],
+  ['CB','Mark their ST alone. Stay close and goal side.'],['LB','Stay home. Take the first pass from the CB and play it up the left.'],['RB','Stay home. Take the first pass from the CB and play it up the right.'],
+  ['CM','Stay beside ST2. Take one of their wide midfielders when defending.'],['ST2','Stay beside the CM. Run into the space behind their LM or RM.'],['ST1','Stay high alone. Run into the gap between their wide midfielders.']];
+NOTES.v2121z=[['All','Labels are from their side. Dotted lines show who marks whom. Do not go through the middle.'],
+  ['CB','Take their ST. Stay back when we attack.'],['LB','Take their RM. Stay home when we attack.'],['RB','Take their LM. Stay home when we attack.'],
+  ['CM','Take their CM with ST2. Pull her to one side, then switch.'],['ST2','Take their CM with the CM, then run into the space behind their LM or RM.'],['ST1','Stay high between their two backs. Block the pass to them and force the ball wide.']];
 P.forEach(function(p){if(NOTES[p.id])p.notes=NOTES[p.id]});
 
 /* what each position does once the team is in the 3-2-1 */
@@ -394,9 +513,28 @@ var PR={
  fb:{GK:'Stay in the box.',CB:'Safe back option for both fullbacks.',LB:'Ball on your side: step up. Ball on the other side: tuck in beside the CB.',RB:'Ball on your side: step up. Ball on the other side: tuck in beside the CB.',CM:'Switch point between the two sides.',ST1:'Stay high.',ST2:'Stay high.'},
  v321:{GK:'Pass wide. Never kick long down the middle.',CB:'Mark their ST alone, goal side.',LB:'Cover their RM when defending. May join the CM when we attack.',RB:'Cover their LM when defending. May join the CM when we attack.',CM:'Cover one of their wide midfielders.',ST1:'Run into the gap beside their LM or RM. Block the middle when defending.',ST2:'Run into the gap beside their LM or RM. Block the middle when defending.'},
  v2121:{GK:'Stay central. Watch for a ball over the top.',CB:'Mark their ST, goal side.',LB:'Mark their RM.',RB:'Mark their LM.',CM:'Mark their CM. Pull her to one side, then switch.',ST1:'Block the pass into the middle and force the ball wide.',ST2:'Block the pass into the middle and force the ball wide.'},
+  v321z:{GK:'Pass wide. Never kick long down the middle.',CB:'Mark their ST alone, goal side.',LB:'Stay home. Take the first pass from the CB.',RB:'Stay home. Take the first pass from the CB.',CM:'Stay beside ST2. Mark one of their wide midfielders.',ST2:'Stay beside the CM. Run into the space behind a wide midfielder.',ST1:'Stay high alone. Run into the gap between their wide midfielders.'},
+ v2121z:{GK:'Stay central. Watch for a ball over the top.',CB:'Mark their ST, goal side.',LB:'Mark their RM. Stay home when we attack.',RB:'Mark their LM. Stay home when we attack.',CM:'Mark their CM with ST2. Pull her to one side, then switch.',ST2:'Mark their CM with the CM, then run behind a wide midfielder.',ST1:'Stay high between their two backs. Block the pass to them.'},
  deep:{GK:'Stay central. Watch for a ball over the top.',CB:'Mark their forward, goal side.',LB:'Mark the wide player on your side. Show her wide.',RB:'Mark the wide player on your side. Show her wide.',CM:'Slow the carrier and make her go wide.',ST2:'Drop back beside the CM.',ST1:'Stay high as the outlet.'},
  p321:{GK:'Stay central. Short passes only.',CB:'Stay central and deep.',LB:STAY,RB:STAY,CM:'Be the hub. Win it, then keep it.',ST2:'Midfielder beside the CM. Support ST1 when it is safe.',ST1:'Lone striker. Stay high and hold the ball up.'}
 };
+
+
+/* 2-3-1 role summaries and notes */
+PR=mix(PR,{
+ m_pl:{GK:'Stay in the box.',LB:'Stay home as the safe pass back.',RB:'Stay home as the safe pass back.',LM:'Hold the left side. Run the sideline when we attack.',CM:'The hub. Block the middle when we defend.',RM:'Hold the right side. Run the sideline when we attack.',ST:'Stay high. Hold the ball up.'},
+ m_sw:{GK:'Stay in the box.',LB:'Stay home in both.',RB:'Stay home in both.',LM:'Run the side up. Drop back into the line when we lose it.',CM:'Step up as the hub. Drop back to block the middle.',RM:'Run the side up. Drop back into the line when we lose it.',ST:'Stay high. Drop to halfway when we defend.'},
+ m_ko:{GK:'Stay in the box.',LB:'Stay home as the safe pass back.',RB:'Stay home as the safe pass back.',LM:'Run up the left to give width.',CM:'The link. Take the pass back, play it wide, then step up.',RM:'Take the wide pass and run the right. Pass inside.',ST:'Kick off back, then run through the middle to finish.'},
+ m_gk:{GK:'Roll short to the LB. Stay on the line.',LB:'Receive in the box corner and pass to the CM. Kick it out to the side if pressed.',RB:'Stay home as the switch option.',LM:'Run up the left. Pass forward to the ST.',CM:'Take the pass, play it wide, then step up for the lay-off.',RM:'Run up the right and pass to the ST.',ST:'Hold the ball up, lay it off, then run through the middle.'},
+ m_tia:{GK:'Stay central as the last option.',LB:'Stay 5-6m behind the CM as the safe option.',RB:'Tuck in toward the middle.',LM:'Throw or receive on your side. Otherwise tuck in.',CM:'First receiver. Pass to the ST, or back to the LB.',RM:'Throw or receive on your side. Otherwise tuck in.',ST:'Stay high. Drop 5m if the CM needs an option.'},
+ m_tid:{GK:'Stay central. Watch for a ball over the top.',LB:'Stay in front of goal. Block the middle.',RB:'Stay in front of goal. Move to the ball side.',LM:'Mark the receiver on your side, 2-3m off. Otherwise tuck in.',CM:'Second marker on the ball side.',RM:'Mark the receiver on your side, 2-3m off. Otherwise tuck in.',ST:'Drop to halfway as the outlet.'},
+ m_ca:{GK:'Stay in goal.',LB:'Wait close for the short pass. Then stay back.',RB:'Hold near halfway to stop a counter.',LM:'Take the corner short, then follow to the edge of the box.',CM:'Run to the near post as the passing link.',RM:'Hold near halfway to stop a counter.',ST:'Arrive on the penalty spot to shoot.'},
+ m_cd:{GK:'Stay in the middle of the goal.',LB:'Hold the post on your side. Clear wide.',RB:'Hold the post on your side. Clear wide.',LM:'Block the short pass at the corner.',CM:'Mark the most dangerous attacker.',RM:'Edge of the box for the clearance and cutback.',ST:'Hold at halfway as the outlet.'},
+ m_v321:{GK:'Pass wide. Never kick long down the middle.',LB:'Mark their ST alone, goal side.',RB:'Cover behind the LB. Stay home.',LM:'Mark their RM when defending. Run up the side when we attack.',CM:'The spare player: we have three midfielders to their two.',RM:'Mark their LM when defending. Take the wide pass.',ST:'Run into the gap between their wide midfielders.'},
+ m_v2121:{GK:'Stay central. Watch for a ball over the top.',LB:'Mark their ST, goal side.',RB:'Cover behind the LB.',LM:'Mark their RM.',CM:'Mark their CM. Pull her to one side, then switch.',RM:'Mark their LM.',ST:'Stay high between their two backs. Block the pass to them.'}
+});
+var MALL={m_pl:'Keep 6-10m between neighbours. Short passes along the ground.',m_sw:'Attacking: the three midfielders spread and move up. Defending: they drop into one tight line.',m_ko:'Short passes. Go wide first, then to the striker.',m_gk:'Short passes along the ground. Go wide first, then to the striker.',m_tia:'If the throw is on the other side of the pitch, swap left and right.',m_tid:'If the throw is on the other side of the pitch, swap left and right.',m_ca:'Short passes are easy to control. RB and RM stay near halfway so a lost ball is not a goal against us.',m_cd:'Mark a player or an area. Clear wide, never down the middle.',m_v321:'Pass wide first, then inside. We have three midfielders to their two, so keep the ball in midfield.',m_v2121:'Labels are from their side. Dotted lines show who marks whom. Do not go through the middle.'};
+P.forEach(function(p){if(MALL[p.id])p.notes=[['All',MALL[p.id]]].concat(POS.filter(function(id){return PR[p.id][id]}).map(function(id){return [id,PR[p.id][id]]}))});
 
 /* position guidance that applies in every play */
 var ALWAYS={GK:['Stand in the middle of the goal, 1-2m off the line.','Shift with the ball to stay between it and the middle of the goal.','Come to the edge of the box for balls over the top.','Get both hands behind the shot. Hold it, or push it wide.','Roll or throw short to LB/RB. Never kick long down the middle.','If pressed, kick it out to the side.']};
@@ -497,7 +635,8 @@ function load(id){
   var d=$('dots');d.innerHTML='';
   
   drawLayers();updateUI();
-  document.querySelectorAll('#c-set .chip,#c-shape .chip,#c-321 .chip').forEach(function(c){c.setAttribute('aria-pressed',c.dataset.id===id?'true':'false')});
+  showGroup(P.filter(function(p){return p.id===id})[0].grp);
+  document.querySelectorAll('#c-set .chip,#c-shape .chip,#c-321 .chip,#c-231 .chip').forEach(function(c){c.setAttribute('aria-pressed',c.dataset.id===id?'true':'false')});
   store('pb-play',id);
 }
 var gDims,gMk,gTr,gAr;
@@ -585,7 +724,7 @@ function updateUI(){
   $('b-back').disabled=k===0;$('b-next').disabled=k>=n;
   var ds=$('dots').children;for(var i=0;i<ds.length;i++)ds[i].className=i<=k?'on':'';
   var cap=$('cap');
-  if(!n){cap.innerHTML='<b>Shape</b>'+(cur.id==='pl'?'Starting positions with the distances to keep.':'Dotted lines show who marks whom.');}
+  if(!n){cap.innerHTML='<b>Shape</b>'+((cur.id==='pl'||cur.id==='m_pl')?'Starting positions with the distances to keep.':'Dotted lines show who marks whom.');}
   else if(k===0){cap.innerHTML='<b>Start</b>Starting positions. Press Play or Next to follow the ball.';}
   else{cap.innerHTML='<b>Step '+k+' of '+n+'</b>'+cur.steps[k-1].t;}
   renderMine();renderAll();renderNotes();
@@ -626,10 +765,25 @@ function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').repl
 function setSel(id){selPos=id;store('pb-pos',id||'');updateUI();drawLayers()}
 
 /* ---------- chips ---------- */
-P.forEach(function(p){
+var GRPS=[['set','3-1-2','c-set'],['z','3-2-1','c-321'],['m','2-3-1','c-231'],['shape','Shapes','c-shape']];
+function showGroup(g){
+  GRPS.forEach(function(x){$(x[2]).hidden=x[0]!==g});
+  var allowed=g==='m'?POS231:POS312;
+  document.querySelectorAll('#c-pos .chip').forEach(function(c){c.hidden=allowed.indexOf(c.dataset.id)<0});
+  if(selPos&&allowed.indexOf(selPos)<0){selPos=null;store('pb-pos','')}
+  document.querySelectorAll('#c-grp .chip').forEach(function(c){c.setAttribute('aria-pressed',c.dataset.g===g?'true':'false')});
+}
+GRPS.forEach(function(x){
+  var b=document.createElement('button');b.className='chip pos';b.textContent=x[1];b.dataset.g=x[0];b.setAttribute('aria-pressed','false');
+  b.onclick=function(){showGroup(x[0]);var f=$(x[2]).firstChild;if(f&&cur.grp!==x[0])load(f.dataset.id)};
+  $('c-grp').appendChild(b);
+});
+function rk(p){return p.id==='pl'||p.id==='p321'||p.id==='m_pl'?0:/^(m_)?v/.test(p.id)?2:1}
+P.map(function(p,i){return [p,i]}).sort(function(a,b){return rk(a[0])-rk(b[0])||a[1]-b[1]}).map(function(x){return x[0]}).forEach(function(p){
   var b=document.createElement('button');b.className='chip';b.textContent=p.name;b.dataset.id=p.id;b.setAttribute('aria-pressed','false');
   b.onclick=function(){load(p.id)};
-  $(p.grp==='set'?'c-set':p.grp==='z'?'c-321':'c-shape').appendChild(b);
+  var box=$(p.grp==='set'?'c-set':p.grp==='z'?'c-321':p.grp==='m'?'c-231':'c-shape');
+  box.appendChild(b);
 });
 POS.forEach(function(id){
   var b=document.createElement('button');b.className='chip pos';b.textContent=id;b.dataset.id=id;b.setAttribute('aria-pressed','false');
